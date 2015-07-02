@@ -77,4 +77,35 @@ class ProgressTimer : NSObject{
     }
 }
 
+func CommonConnect(vc:UIViewController,con:Connection){
+    
+    var err: DSFault!
+    
+    con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+    
+    if err != nil{
+        ShowErrorAlert(vc,err,nil)
+    }
+}
+
+func ShowErrorAlert(vc:UIViewController,err:DSFault,callback:(() -> ())!){
+    let alert = UIAlertController(title: "錯誤", message: err.message, preferredStyle: UIAlertControllerStyle.Alert)
+    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+        if callback != nil{
+            callback()
+        }
+    }))
+    vc.presentViewController(alert, animated: true, completion: nil)
+}
+
+extension Optional{
+    func ParseInt() -> Int{
+        if let str = self as? String{
+            return str.toInt() ?? 0
+        }
+        
+        return 0
+    }
+}
+
 

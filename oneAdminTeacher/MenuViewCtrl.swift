@@ -33,11 +33,14 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         progressTimer = ProgressTimer(progressBar: progressBar)
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Reply, target: self, action: "ChangeSchoolServer")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "SelectClass")
         
         tableView.dataSource = self
         tableView.delegate = self
         
-        Connect()
+        //Connect()
+        
+        CommonConnect(self, _con)
         
         _classData = GetClassData()
         
@@ -102,7 +105,7 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func SelectClass(sender: AnyObject) {
+    func SelectClass() {
         self.presentViewController(alertController, animated: true, completion: nil)
     }
     
@@ -208,16 +211,16 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         })
     }
     
-    func Connect(){
-        
-        var err: DSFault!
-        
-        _con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
-        
-        if err != nil{
-            ShowErrorAlert(err)
-        }
-    }
+//    func Connect(){
+//        
+//        var err: DSFault!
+//        
+//        _con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+//        
+//        if err != nil{
+//            ShowErrorAlert(self,err,nil)
+//        }
+//    }
     
     func GetClassData() -> [ClassItem]{
         
@@ -229,7 +232,7 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         var rsp = _con.sendRequest("main.GetMyTutorClasses", bodyContent: "", &err)
         
         if err != nil{
-            ShowErrorAlert(err)
+            ShowErrorAlert(self,err,nil)
             return retVal
         }
         
@@ -260,7 +263,7 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         //println(rsp)
         
         if err != nil{
-            ShowErrorAlert(err)
+            ShowErrorAlert(self,err,nil)
             return retVal
         }
         
@@ -304,12 +307,6 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         }
         
         return decodedimage ?? defaultImg
-    }
-    
-    func ShowErrorAlert(err:DSFault){
-        let alert = UIAlertController(title: "錯誤", message: err.message, preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-        self.presentViewController(alert, animated: true, completion: nil)
     }
     
 }

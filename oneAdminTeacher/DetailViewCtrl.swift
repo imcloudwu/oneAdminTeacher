@@ -223,6 +223,6 @@ struct SemesterScore{
     var Semester: Int!
 }
 
-enum DisciplineType : Int{
-    case Merit,Demerit
-}
+//enum DisciplineType : Int{
+//    case Merit,Demerit
+//}

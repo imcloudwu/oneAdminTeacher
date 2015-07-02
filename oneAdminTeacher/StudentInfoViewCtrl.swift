@@ -28,7 +28,7 @@ class StudentInfoViewCtrl: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "加入清單", style: UIBarButtonItemStyle.Done, target: self, action: "AddToList")
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "加入清單", style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
         
         Photo.image = StudentData.Photo
         Name.text = StudentData.Name

@@ -247,14 +247,9 @@ public class AccessPoint {
             //let xml = SWXMLHash.parse(rsp)
             let xml = AEXMLDocument(xmlData: rsp, error: &e)
             
-            for elem in xml!.root["Body"]["DoorwayURL"].all! {
-                return elem.stringValue
-//                if let apUrl = elem.stringValue {
-//                    return apUrl
-//                }
+            if let url = xml?.root["Body"]["DoorwayURL"].stringValue{
+                return url
             }
-            
-            xml?.xmlString
         }
         
         return nil
@@ -309,6 +304,10 @@ public class DSFault {
     
     public init(source: DSFault?) {
         sourceFault = source
+    }
+    
+    public init(msg: String) {
+        message = msg
     }
     
     public func initWithNSError(err: NSError) {

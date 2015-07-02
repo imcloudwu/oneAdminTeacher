@@ -8,11 +8,23 @@
 
 import UIKit
 
+enum FuncType : String{
+    case Attendance = "缺曠查詢",Discipline = "獎懲查詢",ExamScore = "評量成績查詢",SemesterScore = "學期成績查詢"
+}
+
 class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
     
     @IBOutlet weak var tableView: UITableView!
     
-    var _funcItem = ["缺曠查詢","獎懲查詢","評量成績查詢","學期成績查詢"]
+//    var _funcItem = [FuncItem(Name: "缺曠查詢", Icon: UIImage(named: "Today-32.png")),
+//        FuncItem(Name: "獎懲查詢", Icon: UIImage(named: "Diploma-32.png")),
+//        FuncItem(Name: "評量成績查詢", Icon: UIImage(named: "Purchase Order-32.png")),
+//        FuncItem(Name: "學期成績查詢", Icon: UIImage(named: "Courses-32.png"))]
+    
+    var _funcItem = [FuncItem(Type: FuncType.Attendance, Icon: UIImage(named: "Today-32.png")),
+    FuncItem(Type: FuncType.Discipline, Icon: UIImage(named: "Diploma-32.png")),
+    FuncItem(Type: FuncType.ExamScore, Icon: UIImage(named: "Purchase Order-32.png")),
+    FuncItem(Type: FuncType.SemesterScore, Icon: UIImage(named: "Courses-32.png"))]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,10 +57,38 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
             cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "funcCell")
         }
         
-        cell!.textLabel?.text = _funcItem[indexPath.row]
-        cell!.imageView?.image = UIImage(named: "Phone-32.png")
-        //cell.detailTextLabel?.text = _funcItem[indexPath.row]
+        cell!.textLabel?.text = _funcItem[indexPath.row].Type.rawValue
+        cell!.imageView?.image = _funcItem[indexPath.row].Icon
+        //cell!.detailTextLabel?.text = _funcItem[indexPath.row].Name
         return cell!
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
+        
+        if Global.CurrentStudent == nil{
+            ShowErrorAlert(self, DSFault(msg: "請先選擇一名學生再進行查詢"),nil)
+            return
+        }
+        
+        switch _funcItem[indexPath.row].Type{
+        
+        case FuncType.Attendance:
+            
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("attendanceViewCtrl") as! AttendanceViewCtrl
+            nextView.StudentData = Global.CurrentStudent
+            
+            self.navigationController?.pushViewController(nextView, animated: true)
+        
+        case FuncType.Discipline:
+            
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("disciplineViewCtrl") as! DisciplineViewCtrl
+            nextView.StudentData = Global.CurrentStudent
+            
+            self.navigationController?.pushViewController(nextView, animated: true)
+            
+        default:
+            ShowErrorAlert(self, DSFault(msg: "這功能尚未開放呦"),nil)
+        }
     }
     
     func ResetViewTitle(){
@@ -95,6 +135,9 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         
         self.presentViewController(actionSheet, animated: true, completion: nil)
     }
-    
-    
+}
+
+struct FuncItem{
+    var Type : FuncType
+    var Icon : UIImage!
 }

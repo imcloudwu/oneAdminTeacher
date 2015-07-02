@@ -53,26 +53,45 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
         
         //網路異常
         if error.code == -1009{
-            let alert = UIAlertController(title: "網路無法連線", message: "請點選右上方的重新整理", preferredStyle: UIAlertControllerStyle.Alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            
+            if let code = GetCodeFromError(error){
+                GotoNextView(code)
+            }
+            else{
+                let alert = UIAlertController(title: "網路無法連線", message: "請點選右上方的重新整理", preferredStyle: UIAlertControllerStyle.Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
         }
         
         //取得code
         if error.domain == "NSURLErrorDomain" && error.code == -1003{
-            if let url = error.userInfo?["NSErrorFailingURLStringKey"] as? String{
-                if let range = url.rangeOfString("http://blank/?state=redirect_uri%3A%2F&code="){
-                    var code = url
-                    code.removeRange(range)
-                    
-                    //println(code)
-                    
-                    let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("prepareViewCtrl") as! PrepareViewCtrl
-                    nextView.code = code
-                    self.presentViewController(nextView, animated: true, completion: nil)
-                }
+            
+            if let code = GetCodeFromError(error){
+                GotoNextView(code)
             }
         }
+    }
+    
+    func GetCodeFromError(error: NSError) -> String?{
+        if let url = error.userInfo?["NSErrorFailingURLStringKey"] as? String{
+            if let range = url.rangeOfString("http://blank/?state=redirect_uri%3A%2F&code="){
+                var code = url
+                code.removeRange(range)
+                
+                //println(code)
+                
+                return code
+            }
+        }
+        
+        return nil
+    }
+    
+    func GotoNextView(code:String){
+        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("prepareViewCtrl") as! PrepareViewCtrl
+        nextView.code = code
+        self.presentViewController(nextView, animated: true, completion: nil)
     }
 }
 

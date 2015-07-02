@@ -21,6 +21,30 @@ class StudentCell : UITableViewCell{
     }
 }
 
+class AttendanceItemCell : UITableViewCell{
+    
+    @IBOutlet weak var Date: UILabel!
+    @IBOutlet weak var Type: UILabel!
+    @IBOutlet weak var Periods: UILabel!
+    
+    override func awakeFromNib() {
+        //
+    }
+}
+
+class DisciplineItemCell : UITableViewCell{
+    
+    @IBOutlet weak var Date: UILabel!
+    @IBOutlet weak var Status: UILabel!
+    @IBOutlet weak var Reason: UILabel!
+    
+    override func awakeFromNib() {
+        //
+    }
+}
+
+
+
 class AbsentCell : UITableViewCell{
     
     @IBOutlet weak var Type: UILabel!
