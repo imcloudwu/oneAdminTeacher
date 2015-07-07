@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CoreData
 
 class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
     
@@ -30,6 +29,13 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //將本機catch讀出
+        for student in CoreData.LoadCatchData(){
+            if !contains(Global.Students, student){
+                Global.Students.append(student)
+            }
+        }
+        
         progressTimer = ProgressTimer(progressBar: progressBar)
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Reply, target: self, action: "ChangeSchoolServer")
@@ -40,7 +46,7 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         
         //Connect()
         
-        CommonConnect(self, _con)
+        CommonConnect(Global.CurrentDsns.AccessPoint, self._con, self)
         
         _classData = GetClassData()
         
@@ -136,62 +142,6 @@ class MenuViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
         nextView.StudentData = _displayData[indexPath.row]
         
         self.navigationController?.pushViewController(nextView, animated: true)
-    }
-    
-    func SaveCatchData(student:Student,forceInsert:Bool) {
-        
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedObjectContext = appDelegate.managedObjectContext!
-        
-        let fetchRequest = NSFetchRequest(entityName: "Student")
-        fetchRequest.predicate = NSPredicate(format: "name=%@", student.Name)
-        
-        var needInsert = true
-        
-        if let fetchResults = managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [NSManagedObject] {
-            if fetchResults.count != 0 {
-                
-                var managedObject = fetchResults[0]
-                //managedObject.setValue(student.Name, forKey: "name")
-                managedObject.setValue(student.ClassName, forKey: "class_name")
-                managedObject.setValue(student.ContactPhone, forKey: "phone")
-                managedObject.setValue(UIImagePNGRepresentation(student.Photo), forKey: "photo")
-                
-                needInsert = false
-            }
-        }
-        
-        if needInsert || forceInsert{
-            let myEntityDescription = NSEntityDescription.entityForName("Student", inManagedObjectContext: managedObjectContext)
-            
-            let myObject = NSManagedObject(entity: myEntityDescription!, insertIntoManagedObjectContext: managedObjectContext)
-            
-            myObject.setValue(student.Name, forKey: "name")
-            myObject.setValue(student.ClassName, forKey: "class_name")
-            myObject.setValue(student.ContactPhone, forKey: "phone")
-            myObject.setValue(UIImagePNGRepresentation(student.Photo), forKey: "photo")
-        }
-        
-        managedObjectContext.save(nil)
-    }
-    
-    func LoadCatchData(){
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-        let managedObjectContext = appDelegate.managedObjectContext!
-        let fetchRequest = NSFetchRequest(entityName: "Student")
-        
-        var error: NSError?
-        
-        let results = managedObjectContext.executeFetchRequest(fetchRequest, error: &error) as! [NSManagedObject]
-        
-        for obj in results {
-            let name = obj.valueForKey("name") as! String
-            let class_name = obj.valueForKey("class_name") as! String
-            let phone = obj.valueForKey("phone") as! String
-            let photo = obj.valueForKey("photo") as! NSData
-            
-            //_studentData.append(Student(Photo: UIImage(data: photo), ClassName : class_name, Name: name, Phone: phone))
-        }
     }
     
     func SetDataToTableView(cls:ClassItem){

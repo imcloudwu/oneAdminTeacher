@@ -19,6 +19,7 @@ public class Global{
     static var CurrentDsns : DsnsItem!
     static var Students = [Student]()
     static var CurrentStudent : Student!
+    static var CountProgressTime = [ProgressTimer]()
     
     static func DeleteStudent(student:Student){
         var newData = [Student]()
@@ -45,14 +46,17 @@ public class Global{
 }
 
 class ProgressTimer : NSObject{
-    weak var ProgressBar : UIProgressView!
+    var ProgressBar : UIProgressView!
     var Timer : NSTimer?
+    private var limitTime : Int
     
     init(progressBar:UIProgressView){
         ProgressBar = progressBar
+        limitTime = 0
     }
-    
+
     func StartProgress(){
+        Timer?.invalidate()
         Timer = NSTimer.scheduledTimerWithTimeInterval(0.01667, target: self, selector: "timerCallback", userInfo: nil, repeats: true)
         ProgressBar.hidden = false
         ProgressBar.progress = 0.0
@@ -63,25 +67,37 @@ class ProgressTimer : NSObject{
         ProgressBar.hidden = true
         Timer?.invalidate()
         Timer = nil
+        limitTime = 0
     }
     
     func timerCallback() {
+        
+        limitTime++
+        
+        if limitTime > 200{
+            StopProgress()
+            return
+        }
+        
+        //println("still running...\(limitTime)")
+        
         if !ProgressBar.hidden{
-            if ProgressBar?.progress >= 0.95{
-                ProgressBar?.progress = 0.95
+            if ProgressBar.progress >= 0.95{
+                ProgressBar.progress = 0.95
             }
             else{
-                ProgressBar?.progress += 0.05
+                ProgressBar.progress += 0.05
             }
         }
     }
 }
 
-func CommonConnect(vc:UIViewController,con:Connection){
+func CommonConnect(dsns:String,con:Connection,vc:UIViewController){
     
     var err: DSFault!
     
-    con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+    //con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+    con.connect(dsns, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
     
     if err != nil{
         ShowErrorAlert(vc,err,nil)
@@ -98,14 +114,31 @@ func ShowErrorAlert(vc:UIViewController,err:DSFault,callback:(() -> ())!){
     vc.presentViewController(alert, animated: true, completion: nil)
 }
 
-extension Optional{
-    func ParseInt() -> Int{
-        if let str = self as? String{
-            return str.toInt() ?? 0
+//整理出資料的學年度學期並回傳
+func GetSemesters<T>(datas:[T]) -> [SemesterItem]{
+    
+    var retVal = [SemesterItem]()
+    var newData = [SemesterProtocol]()
+    
+    for data in datas{
+        if let sp = data as? SemesterProtocol{
+            newData.append(sp)
         }
-        
-        return 0
     }
+    
+    for data in newData{
+        let semester = SemesterItem(SchoolYear: data.SchoolYear, Semester: data.Semester)
+        if !contains(retVal, semester){
+            retVal.append(semester)
+        }
+    }
+    
+    if retVal.count > 0{
+        retVal.sort({$0 > $1})
+    }
+    
+    return retVal
 }
+
 
 

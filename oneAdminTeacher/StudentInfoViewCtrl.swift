@@ -61,6 +61,9 @@ class StudentInfoViewCtrl: UIViewController {
     func AddToList(){
         Global.Students.append(StudentData)
         LockBtnEnableCheck()
+        
+        //存入catch
+        CoreData.SaveCatchData(StudentData)
     }
     
     func GetAddress(xmlString:String) -> String{

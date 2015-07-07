@@ -16,11 +16,6 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
     
     @IBOutlet weak var tableView: UITableView!
     
-//    var _funcItem = [FuncItem(Name: "缺曠查詢", Icon: UIImage(named: "Today-32.png")),
-//        FuncItem(Name: "獎懲查詢", Icon: UIImage(named: "Diploma-32.png")),
-//        FuncItem(Name: "評量成績查詢", Icon: UIImage(named: "Purchase Order-32.png")),
-//        FuncItem(Name: "學期成績查詢", Icon: UIImage(named: "Courses-32.png"))]
-    
     var _funcItem = [FuncItem(Type: FuncType.Attendance, Icon: UIImage(named: "Today-32.png")),
     FuncItem(Type: FuncType.Discipline, Icon: UIImage(named: "Diploma-32.png")),
     FuncItem(Type: FuncType.ExamScore, Icon: UIImage(named: "Purchase Order-32.png")),
@@ -34,6 +29,7 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: "DeleteStudent")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "SelectStudent")
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
@@ -86,6 +82,20 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
             
             self.navigationController?.pushViewController(nextView, animated: true)
             
+        case FuncType.ExamScore:
+            
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("examScoreViewCtrl") as! ExamScoreViewCtrl
+            nextView.StudentData = Global.CurrentStudent
+            
+            self.navigationController?.pushViewController(nextView, animated: true)
+            
+        case FuncType.SemesterScore:
+            
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("semesterScoreViewCtrl") as! SemesterScoreViewCtrl
+            nextView.StudentData = Global.CurrentStudent
+            
+            self.navigationController?.pushViewController(nextView, animated: true)
+            
         default:
             ShowErrorAlert(self, DSFault(msg: "這功能尚未開放呦"),nil)
         }
@@ -111,6 +121,8 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         for stu in Global.Students{
             let action = UIAlertAction(title: stu.DSNS + "_" + stu.Name, style: UIAlertActionStyle.Default, handler: { (act) -> Void in
                 Global.DeleteStudent(stu)
+                //刪除此筆catch
+                CoreData.DeleteStudent(stu)
                 self.ResetViewTitle()
             })
             
@@ -121,6 +133,7 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
     }
     
     func SelectStudent(){
+        
         let actionSheet = UIAlertController(title: "請選擇一位學生", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         actionSheet.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
         

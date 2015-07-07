@@ -43,8 +43,18 @@ class DisciplineItemCell : UITableViewCell{
     }
 }
 
+class SemesterScoreItemCell : UITableViewCell{
+    
+    @IBOutlet weak var Subject: UILabel!
+    @IBOutlet weak var Score: UILabel!
+    @IBOutlet weak var Info: UILabel!
+    
+    override func awakeFromNib() {
+        //
+    }
+}
 
-
+/*
 class AbsentCell : UITableViewCell{
     
     @IBOutlet weak var Type: UILabel!
@@ -110,3 +120,4 @@ class ExamScoreTitleCell : UITableViewCell{
     override func awakeFromNib() {
     }
 }
+*/

@@ -51,6 +51,8 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
     
     func webView(webView: UIWebView, didFailLoadWithError error: NSError){
         
+        progressTimer.StopProgress()
+        
         //網路異常
         if error.code == -1009{
             

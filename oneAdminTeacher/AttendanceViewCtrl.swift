@@ -47,20 +47,14 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
-            CommonConnect(self, self._con)
-            //self.Connect()
+            CommonConnect(self.StudentData.DSNS, self._con, self)
             self._data = self.GetAttendanceData()
             
-            for data in self._data{
-                let semester = SemesterItem(SchoolYear: data.SchoolYear, Semester: data.Semester)
-                if !contains(self._Semesters, semester){
-                    self._Semesters.append(semester)
-                }
-            }
+            self._Semesters = GetSemesters(self._data)
             
             dispatch_async(dispatch_get_main_queue(), {
+                
                 if self._Semesters.count > 0{
-                    self._Semesters.sort({$0 > $1})
                     self.SetDataToTableView(self._Semesters[0])
                 }
                 
@@ -74,16 +68,18 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         // Dispose of any resources that can be recreated.
     }
     
-//    func Connect(){
-//        
-//        var err: DSFault!
-//        
-//        _con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
-//        
-//        if err != nil{
-//            ShowErrorAlert(self,err,nil)
-//        }
-//    }
+    func ChangeSemester(){
+        let actionSheet = UIAlertController(title: "請選擇學年度學期", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        actionSheet.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+        
+        for semester in _Semesters{
+            actionSheet.addAction(UIAlertAction(title: semester.Description, style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                self.SetDataToTableView(semester)
+            }))
+        }
+        
+        self.presentViewController(actionSheet, animated: true, completion: nil)
+    }
     
     func GetAttendanceData() -> [AttendanceItem]{
         
@@ -133,6 +129,7 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         for data in self._data{
             if data.SchoolYear == semester.SchoolYear && data.Semester == semester.Semester{
                 
+                //先合併同一天的假別
                 let key = data.OccurDate + "_" + data.AbsenceType
                 
                 if tmpData[key] == nil{
@@ -145,14 +142,13 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
             }
         }
         
-        for tmp in tmpData{
-            newData.append(tmp.1)
-        }
+        newData = tmpData.values.array
         
         newData.sort{$0.OccurDate > $1.OccurDate}
         
         var sum = [String:Int]()
         
+        //統計相同假別的數量
         for data in newData{
             if sum[data.AbsenceType] == nil{
                 sum[data.AbsenceType] = 0
@@ -162,30 +158,20 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         }
         
         var total = 0
+        
+        //按個別假別種類建立一個summary item
         for s in sum{
-            var sumData = AttendanceItem(OccurDate: s.0, SchoolYear: "", Semester: "", AbsenceType: "summaryItem", Period: "", Value: s.1)
-            newData.insert(sumData, atIndex: 0)
+            var summaryItem = AttendanceItem(OccurDate: "", SchoolYear: "", Semester: "", AbsenceType: s.0, Period: "", Value: s.1)
+            newData.insert(summaryItem, atIndex: 0)
             total += s.1
         }
         
-        newData.insert(AttendanceItem(OccurDate: "總計", SchoolYear: "", Semester: "", AbsenceType: "summaryItem", Period: "", Value: total), atIndex: 0)
+        //總計
+        newData.insert(AttendanceItem(OccurDate: "", SchoolYear: "", Semester: "", AbsenceType: "總計", Period: "", Value: total), atIndex: 0)
         
         self._displayData = newData
         
         self.tableView.reloadData()
-    }
-    
-    func ChangeSemester(){
-        let actionSheet = UIAlertController(title: "請選擇學年度學期", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
-        actionSheet.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
-        
-        for semeter in _Semesters{
-            actionSheet.addAction(UIAlertAction(title: semeter.Description, style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-                self.SetDataToTableView(semeter)
-            }))
-        }
-        
-        self.presentViewController(actionSheet, animated: true, completion: nil)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
@@ -193,7 +179,11 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
-        if _displayData[indexPath.row].AbsenceType == "summaryItem"{
+        
+        let data = _displayData[indexPath.row]
+        
+        //處理summmary item
+        if data.SchoolYear == "" && data.Semester == ""{
             var cell = tableView.dequeueReusableCellWithIdentifier("summaryItem") as? UITableViewCell
             
             if cell == nil{
@@ -201,17 +191,18 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
                 cell?.textLabel?.textColor = UIColor(red: 19/255, green: 144/255, blue: 255/255, alpha: 1)
             }
             
-            cell!.textLabel?.text = _displayData[indexPath.row].OccurDate
+            cell!.textLabel?.text = data.AbsenceType
             cell!.detailTextLabel?.text = "\(_displayData[indexPath.row].Value)"
             
             return cell!
         }
         
+        //處理一般的cell
         let cell = tableView.dequeueReusableCellWithIdentifier("attendanceItemCell") as! AttendanceItemCell
         
-        cell.Date.text = _displayData[indexPath.row].OccurDate
-        cell.Type.text = _displayData[indexPath.row].AbsenceType + " (\(_displayData[indexPath.row].Value))"
-        cell.Periods.text = _displayData[indexPath.row].Period
+        cell.Date.text = data.OccurDate
+        cell.Type.text = data.AbsenceType + " (\(data.Value))"
+        cell.Periods.text = data.Period
         
         return cell
     }
@@ -221,7 +212,7 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat{
-        if _displayData[indexPath.row].AbsenceType == "summaryItem"{
+        if _displayData[indexPath.row].SchoolYear == "" && _displayData[indexPath.row].Semester == ""{
             return 30
         }
         
@@ -230,7 +221,7 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
     
 }
 
-struct AttendanceItem{
+struct AttendanceItem : SemesterProtocol{
     var OccurDate : String
     var SchoolYear : String
     var Semester : String

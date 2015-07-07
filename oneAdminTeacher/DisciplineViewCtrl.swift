@@ -47,21 +47,15 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
-            CommonConnect(self, self._con)
+            CommonConnect(self.StudentData.DSNS, self._con, self)
             
             self._data = self.GetDisciplineData()
             
-            for data in self._data{
-                let semester = SemesterItem(SchoolYear: data.SchoolYear, Semester: data.Semester)
-                if !contains(self._Semesters, semester){
-                    self._Semesters.append(semester)
-                }
-            }
+            self._Semesters = GetSemesters(self._data)
             
             dispatch_async(dispatch_get_main_queue(), {
                 
                 if self._Semesters.count > 0{
-                    self._Semesters.sort({$0 > $1})
                     self.SetDataToTableView(self._Semesters[0])
                 }
                 
@@ -79,9 +73,9 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         let actionSheet = UIAlertController(title: "請選擇學年度學期", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         actionSheet.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
         
-        for semeter in _Semesters{
-            actionSheet.addAction(UIAlertAction(title: semeter.Description, style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-                self.SetDataToTableView(semeter)
+        for semester in _Semesters{
+            actionSheet.addAction(UIAlertAction(title: semester.Description, style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+                self.SetDataToTableView(semester)
             }))
         }
         
@@ -177,14 +171,14 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
                 var isClear = false
                 
                 if meritFlag == DisciplineType.Merit{
-                    ma = (discipline["Merit"].attributes["A"] as? String).ParseInt()
-                    mb = (discipline["Merit"].attributes["B"] as? String).ParseInt()
-                    mc = (discipline["Merit"].attributes["C"] as? String).ParseInt()
+                    ma = (discipline["Merit"].attributes["A"] as! String).intValue
+                    mb = (discipline["Merit"].attributes["B"] as! String).intValue
+                    mc = (discipline["Merit"].attributes["C"] as! String).intValue
                 }
                 else{
-                    da = (discipline["Demerit"].attributes["A"] as? String).ParseInt()
-                    db = (discipline["Demerit"].attributes["B"] as? String).ParseInt()
-                    dc = (discipline["Demerit"].attributes["C"] as? String).ParseInt()
+                    da = (discipline["Demerit"].attributes["A"] as! String).intValue
+                    db = (discipline["Demerit"].attributes["B"] as! String).intValue
+                    dc = (discipline["Demerit"].attributes["C"] as! String).intValue
                     isClear = (discipline["Demerit"].attributes["Cleared"] as! String) == "是"
                 }
                 
@@ -214,7 +208,7 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
             }
             
             cell!.textLabel?.text = data.Reason
-            cell!.detailTextLabel?.text = "\(data.GetValue())"
+            cell!.detailTextLabel?.text = "\(data.Value)"
             
             return cell!
         }
@@ -254,7 +248,7 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
     
 }
 
-struct DisciplineItem{
+struct DisciplineItem : SemesterProtocol{
     var Type:DisciplineType
     var Date:String
     var SchoolYear:String
@@ -268,7 +262,7 @@ struct DisciplineItem{
     var DB:Int
     var DC:Int
     
-    func GetValue() -> Int{
+    var Value : Int{
         switch Reason{
         case "獎勵總計":
             return MA + MB + MC
