@@ -8,7 +8,7 @@
 
 import UIKit
 
-class StudentInfoViewCtrl: UIViewController {
+class StudentInfoViewCtrl: UIViewController,ContainerViewProtocol {
     
     @IBOutlet weak var Photo: UIImageView!
     @IBOutlet weak var Name: UILabel!
@@ -25,12 +25,22 @@ class StudentInfoViewCtrl: UIViewController {
     
     var StudentData:Student!
     
+    var ParentNavigationItem : UINavigationItem?
+    
+    var AddBtn : UIBarButtonItem!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "加入清單", style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
+        //self.automaticallyAdjustsScrollViewInsets = true
+        
+        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "加入清單", style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
+        AddBtn = UIBarButtonItem(image: UIImage(named: "Add User-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
+        ParentNavigationItem?.rightBarButtonItems?.append(AddBtn)
         
         Photo.image = StudentData.Photo
+        Photo.layer.cornerRadius = 10
+        Photo.layer.masksToBounds = true
         Name.text = StudentData.Name
         StudentNumber.text = StudentData.StudentNumber
         Gender.text = StudentData.Gender
@@ -107,10 +117,10 @@ class StudentInfoViewCtrl: UIViewController {
     
     func LockBtnEnableCheck(){
         if contains(Global.Students, StudentData){
-            self.navigationItem.rightBarButtonItem?.enabled = false
+            AddBtn.enabled = false
         }
         else{
-            self.navigationItem.rightBarButtonItem?.enabled = true
+            AddBtn.enabled = true
         }
     }
 }

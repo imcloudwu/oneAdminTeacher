@@ -13,10 +13,36 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var centerContainer: MMDrawerController?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        var rootViewController = self.window!.rootViewController
+        
+        let mainStoryboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        var centerViewController = mainStoryboard.instantiateViewControllerWithIdentifier("StartView") as! UINavigationController
+        
+        var leftViewController = mainStoryboard.instantiateViewControllerWithIdentifier("SideMenuViewCtrl") as! SideMenuViewCtrl
+        
+        //var rightViewController = mainStoryboard.instantiateViewControllerWithIdentifier("RightSideViewController") as!  RightSideViewController
+        
+        //var leftSideNav = UINavigationController(rootViewController: leftViewController)
+        //var centerNav = UINavigationController(rootViewController: centerViewController)
+        //var rightNav = UINavigationController(rootViewController: rightViewController)
+        
+        centerContainer = MMDrawerController(centerViewController: centerViewController, leftDrawerViewController: leftViewController,rightDrawerViewController:nil)
+        
+        //centerContainer!.openDrawerGestureModeMask = MMOpenDrawerGestureMode.PanningCenterView;
+        //centerContainer!.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.PanningCenterView;
+        centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.TapCenterView
+        
+        //centerContainer?.showsShadow = true
+        centerContainer?.maximumLeftDrawerWidth = 150
+        
+        window!.rootViewController = centerContainer
+        window!.makeKeyAndVisible()
+        
         return true
     }
     

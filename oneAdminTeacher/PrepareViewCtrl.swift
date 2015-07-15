@@ -33,8 +33,9 @@ class PrepareViewCtrl: UIViewController {
                     
                     dispatch_async(dispatch_get_main_queue(), {
                         
-                        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("schoolOptionsView") as! UIViewController
-                        self.presentViewController(nextView, animated: true, completion: nil)
+                        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
+                        ChangeContentView(nextView)
+                        //self.presentViewController(nextView, animated: true, completion: nil)
                     })
                 })
             })

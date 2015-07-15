@@ -25,6 +25,10 @@ extension String {
         return self.toInt() ?? 0
     }
     
+    var int16Value: Int16 {
+        return Int16(self.intValue)
+    }
+    
     var doubleValue: Double {
         return (self as NSString).doubleValue
     }
@@ -32,11 +36,44 @@ extension String {
     public var UrlEncoding: String?{
         return self.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
     }
+    
+    func PadLeft(leng:Int,str:String) -> String{
+        
+        if (self as NSString).length < leng {
+            var l = leng - (self as NSString).length
+            
+            var s = ""
+            
+            for i in 0...l{
+                s += str
+            }
+            
+            return s + self
+        }
+        
+        return self
+    }
 }
 
-//四捨五入到小數點第二位
+
 extension Double {
-    func toString() -> String {
-        return String(format: "%.2f", self)
+    
+    //四捨五入到小數點第二位(前一位數是偶數時是五捨六入)
+//    func toString(precision : Int) -> String {
+//        return String(format: "%.\(precision)f", self)
+//    }
+    
+    func Round(precision : Int16) -> Double {
+        var x = NSDecimalNumber(string: "\(self)")
+        var y = NSDecimalNumber(int: 1)
+        
+        //小數點第二位四捨五入進位
+        var behavior = NSDecimalNumberHandler(roundingMode: NSRoundingMode.RoundPlain, scale: precision, raiseOnExactness: true, raiseOnOverflow: true, raiseOnUnderflow: true, raiseOnDivideByZero: true)
+        
+        return x.decimalNumberByDividingBy(y, withBehavior: behavior).doubleValue
+    }
+    
+    func ToString(precision : Int16) -> String {
+        return String(format: "%.\(precision)f", self)
     }
 }

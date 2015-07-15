@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
+class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource,ContainerViewProtocol {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
@@ -24,12 +24,16 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
     
     var _con = Connection()
     
+    var ParentNavigationItem : UINavigationItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         progressTimer = ProgressTimer(progressBar: progress)
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "ChangeSemester")
+        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "ChangeSemester")
+        
+        ParentNavigationItem?.rightBarButtonItems?.append(UIBarButtonItem(image: UIImage(named: "Age-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeSemester"))
         
         tableView.delegate = self
         tableView.dataSource = self

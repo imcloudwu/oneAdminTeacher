@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource {
+class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource,ContainerViewProtocol {
     
     var _con = Connection()
     
@@ -23,6 +23,8 @@ class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDat
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
     
+    var ParentNavigationItem : UINavigationItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,8 +33,10 @@ class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDat
         tableView.delegate = self
         tableView.dataSource = self
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "ChangeSemester")
+        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "ChangeSemester")
         
+        //ParentNavigationItem?.rightBarButtonItems?.append(UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Search, target: self, action: "ChangeSemester"))
+        ParentNavigationItem?.rightBarButtonItems?.append(UIBarButtonItem(image: UIImage(named: "Age-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeSemester"))
         // Do any additional setup after loading the view, typically from a nib.
     }
     

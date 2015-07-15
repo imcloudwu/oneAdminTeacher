@@ -20,6 +20,7 @@ public class Global{
     static var Students = [Student]()
     static var CurrentStudent : Student!
     static var CountProgressTime = [ProgressTimer]()
+    static var ClassList : [ClassItem]!
     
     static func DeleteStudent(student:Student){
         var newData = [Student]()
@@ -52,6 +53,7 @@ class ProgressTimer : NSObject{
     
     init(progressBar:UIProgressView){
         ProgressBar = progressBar
+        ProgressBar.hidden = true
         limitTime = 0
     }
 
@@ -139,6 +141,21 @@ func GetSemesters<T>(datas:[T]) -> [SemesterItem]{
     
     return retVal
 }
+
+func ChangeContentView(vc:UIViewController){
+    var app = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    app.centerContainer?.setCenterViewController(vc, withCloseAnimation: true, completion: nil)
+    //app.centerContainer?.closeDrawerAnimated(true, completion: nil)
+//    app.centerContainer?.closeDrawerAnimated(true, completion: { (finish) -> Void in
+//        app.centerContainer?.centerViewController = vc
+//        
+//        app.centerContainer?.setCenterViewController(<#newCenterViewController: UIViewController!#>, withFullCloseAnimation: <#Bool#>, completion: <#((Bool) -> Void)!##(Bool) -> Void#>)
+//    })
+    //app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
+}
+
+
 
 
 

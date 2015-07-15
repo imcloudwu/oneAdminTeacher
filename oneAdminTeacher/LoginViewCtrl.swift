@@ -93,7 +93,8 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
     func GotoNextView(code:String){
         let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("prepareViewCtrl") as! PrepareViewCtrl
         nextView.code = code
-        self.presentViewController(nextView, animated: true, completion: nil)
+        ChangeContentView(nextView)
+        //self.presentViewController(nextView, animated: true, completion: nil)
     }
 }
 
