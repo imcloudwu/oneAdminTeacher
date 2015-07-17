@@ -33,6 +33,13 @@ class PrepareViewCtrl: UIViewController {
                     
                     dispatch_async(dispatch_get_main_queue(), {
                         
+                        //將本機catch讀出
+                        for student in CoreData.LoadCatchData(){
+                            if !contains(Global.Students, student){
+                                Global.Students.append(student)
+                            }
+                        }
+                        
                         let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
                         ChangeContentView(nextView)
                         //self.presentViewController(nextView, animated: true, completion: nil)

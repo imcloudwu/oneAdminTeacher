@@ -12,6 +12,12 @@ class SideMenuViewCtrl: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        var background = UIImageView(image: UIImage(named: "sidebackground.jpg"))
+        background.frame = self.view.bounds
+        background.contentMode = UIViewContentMode.ScaleToFill
+        self.view.insertSubview(background, atIndex: 0)
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     

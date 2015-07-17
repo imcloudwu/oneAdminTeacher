@@ -21,6 +21,11 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     
     var sideMenuBtn : UIBarButtonItem!
     
+    var DsnsResult = [String:Bool]()
+    
+    let redColor = UIColor(red: 244 / 255, green: 67 / 255, blue: 54 / 255, alpha: 1)
+    let blueColor = UIColor(red: 33 / 255, green: 150 / 255, blue: 243 / 255, alpha: 1)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -29,13 +34,13 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         self.refreshControl.addTarget(self, action: "ReloadData", forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
         
-        
         sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu Filled-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
         self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         tableView.delegate = self
         tableView.dataSource = self
         self.navigationItem.title = "我的班級"
+        self.navigationController?.interactivePopGestureRecognizer.enabled = false
         
         progressTimer = ProgressTimer(progressBar: progress)
         
@@ -71,33 +76,69 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     
     func GetMyClassList() {
         
+        self.progress.hidden = false
+        
         var tmpList = [ClassItem]()
         
-        progressTimer.StartProgress()
+        DsnsResult.removeAll(keepCapacity: false)
+        for dsns in Global.DsnsList{
+            DsnsResult[dsns.Name] = false
+        }
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+        var percent : Float = 1 / Float(DsnsResult.count)
+        
+        self.progress.progress = 0
+        
+        for dsns in Global.DsnsList{
             
-            for dsns in Global.DsnsList{
+            //self.progressTimer.StartProgress()
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                 
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                var con = Connection()
+                CommonConnect(dsns.AccessPoint, con, self)
+                tmpList += self.GetClassData(con)
+                
+                dispatch_async(dispatch_get_main_queue(), {
                     
-                    var con = Connection()
-                    CommonConnect(dsns.AccessPoint, con, self)
+                    self.DsnsResult[dsns.Name] = true
+                    //self.progressTimer.StopProgress()
+                    self.progress.progress += percent
                     
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        tmpList += self.GetClassData(con)
-                        self._ClassList = tmpList
-                        Global.ClassList = tmpList
-                        self.tableView.reloadData()
-                    })
+                    if self.AllDone(){
+                        self.progress.hidden = true
+                    }
+                    
+                    self._ClassList = tmpList
+                    Global.ClassList = tmpList
+                    self.tableView.reloadData()
                 })
-            }
-            
-            dispatch_async(dispatch_get_main_queue(), {
-                self.progressTimer.StopProgress()
             })
-        })
+        }
+        
+//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+//            
+//            for dsns in Global.DsnsList{
+//                
+//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+//                    
+//                    var con = Connection()
+//                    CommonConnect(dsns.AccessPoint, con, self)
+//                    tmpList += self.GetClassData(con)
+//                    
+//                    dispatch_async(dispatch_get_main_queue(), {
+//                        
+//                        self._ClassList = tmpList
+//                        Global.ClassList = tmpList
+//                        self.tableView.reloadData()
+//                    })
+//                })
+//            }
+//            
+//            dispatch_async(dispatch_get_main_queue(), {
+//                self.progressTimer.StopProgress()
+//            })
+//        })
     }
     
     func GetClassData(con:Connection) -> [ClassItem]{
@@ -114,7 +155,9 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
             return retVal
         }
         
-        let xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+        var xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+        
+        retVal.append(ClassItem(ID: "header", ClassName: GetSchoolName(con), AccessPoint: "", GradeYear: 0, Major: ""))
         
         if let classes = xml?.root["ClassList"]["Class"].all {
             for cls in classes{
@@ -122,11 +165,62 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                 let ClassName = cls["ClassName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: ClassID, ClassName: con.accessPoint + "_" + ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear))
+                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "班導師"))
+            }
+        }
+        
+        rsp = con.sendRequest("main.GetMyCourseClasses", bodyContent: "", &err)
+        xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+        
+        if let classes = xml?.root["ClassList"]["Class"].all {
+            for cls in classes{
+                let ClassID = cls["ClassID"].stringValue
+                let ClassName = cls["ClassName"].stringValue
+                let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
+                
+                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課老師"))
             }
         }
         
         return retVal
+    }
+    
+    //new solution
+    func GetSchoolName(con:Connection) -> String{
+        
+        var schoolName = ""
+        
+        //encode成功呼叫查詢
+        if let encodingName = con.accessPoint.UrlEncoding{
+            
+            var data = HttpClient.Get("http://dsns.1campus.net/campusman.ischool.com.tw/config.public/GetSchoolList?content=%3CRequest%3E%3CMatch%3E\(encodingName)%3C/Match%3E%3CPagination%3E%3CPageSize%3E10%3C/PageSize%3E%3CStartPage%3E1%3C/StartPage%3E%3C/Pagination%3E%3C/Request%3E")
+            
+            if let rsp = data{
+                
+                //println(NSString(data: rsp, encoding: NSUTF8StringEncoding))
+                
+                var nserr : NSError?
+                
+                let xml = AEXMLDocument(xmlData: rsp, error: &nserr)
+                
+                if let name = xml?.root["Response"]["School"]["Title"].stringValue{
+                    schoolName = name
+                }
+            }
+        }
+        
+        return schoolName
+    }
+    
+    func AllDone() -> Bool{
+        
+        for dsns in DsnsResult{
+            if !dsns.1{
+                return false
+            }
+        }
+        
+        return true
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int{
@@ -134,15 +228,56 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
+        
+        let data = _ClassList[indexPath.row]
+        
+        if data.ID == "header"{
+            var cell = tableView.dequeueReusableCellWithIdentifier("summaryItem") as? UITableViewCell
+            
+            if cell == nil{
+                cell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "summaryItem")
+                cell?.backgroundColor = UIColor(red: 238 / 255, green: 238 / 255, blue: 238 / 255, alpha: 1)
+            }
+            
+            cell?.textLabel?.text = data.ClassName
+            return cell!
+        }
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("ClassCell") as! ClassCell
-        cell.ClassName.text = _ClassList[indexPath.row].ClassName
+        cell.ClassName.text = data.ClassName
+        cell.Major.text = data.Major
+        
+        //字串擷取
+        let subString = (data.ClassName as NSString).substringToIndex(1)
+        cell.ClassIcon.text = subString
+        
+        if data.Major == "班導師"{
+            cell.ClassIcon.backgroundColor = redColor
+        }
+        else{
+            cell.ClassIcon.backgroundColor = blueColor
+        }
+        
         return cell
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
-        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("StudentViewCtrl") as! StudentViewCtrl
-        nextView.ClassData = _ClassList[indexPath.row]
-        self.navigationController?.pushViewController(nextView, animated: true)
+        
+        let data = _ClassList[indexPath.row]
+        
+        if data.ID != "header"{
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("StudentViewCtrl") as! StudentViewCtrl
+            nextView.ClassData = _ClassList[indexPath.row]
+            self.navigationController?.pushViewController(nextView, animated: true)
+        }
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat{
+        if _ClassList[indexPath.row].ID == "header"{
+            return 30
+        }
+        
+        return 60
     }
 }
 
@@ -151,4 +286,5 @@ struct ClassItem{
     var ClassName : String
     var AccessPoint : String
     var GradeYear : Int
+    var Major : String
 }

@@ -26,21 +26,16 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //將本機catch讀出
-//        for student in CoreData.LoadCatchData(){
-//            if !contains(Global.Students, student){
-//                Global.Students.append(student)
-//            }
-//        }
-        
         progressTimer = ProgressTimer(progressBar: progressBar)
         
         tableView.dataSource = self
         tableView.delegate = self
         
-        self.navigationItem.title = ClassData.ClassName
-        
         // Do any additional setup after loading the view, typically from a nib.
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        self.navigationItem.title = ClassData.ClassName
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -62,10 +57,8 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell{
         let cell = tableView.dequeueReusableCellWithIdentifier("studentCell") as! StudentCell
         cell.Photo.image = _displayData[indexPath.row].Photo
-        cell.Label1.text = "姓名: \(_displayData[indexPath.row].Name)"
-        cell.Label2.text = "學號: \(_displayData[indexPath.row].StudentNumber)   座號: \(_displayData[indexPath.row].SeatNo) "
-        cell.Label3.text = "姓別: \(_displayData[indexPath.row].Gender)"
-        cell.Label4.text = "監護人: \(_displayData[indexPath.row].CustodianName)"
+        cell.Label1.text = "\(_displayData[indexPath.row].Name)"
+        cell.Label2.text = _displayData[indexPath.row].SeatNo == "" ? "" : "座號: \(_displayData[indexPath.row].SeatNo) "
         return  cell
     }
     

@@ -11,11 +11,18 @@ import UIKit
 class StudentDetailViewCtrl: UIViewController {
     
     @IBOutlet weak var SubTitleView: UIView!
+    @IBOutlet weak var SubTitle1: UILabel!
+    @IBOutlet weak var SubTitle2: UILabel!
+    @IBOutlet weak var SubTitle3: UILabel!
+    
     @IBOutlet weak var Height: NSLayoutConstraint!
     @IBOutlet weak var EmbedView: UIView!
     @IBOutlet weak var Segment: UISegmentedControl!
     
     @IBOutlet weak var PhotoImage: UIImageView!
+    
+    let upArrow = UIImage(named: "Up 4-25.png")
+    let downArrow = UIImage(named: "Down 4-25.png")
     
     var ExpandBtn : UIBarButtonItem!
     
@@ -24,16 +31,21 @@ class StudentDetailViewCtrl: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        var background = UIImageView(image: UIImage(named: "background2.png"))
+        var pics = ["background.png","background5.png"]
+        let randomIndex = Int(arc4random_uniform(2))
+        
+        var background = UIImageView(image: UIImage(named: pics[randomIndex]))
         background.frame = SubTitleView.bounds
         //nback.contentMode = UIViewContentMode.ScaleAspectFill
         SubTitleView.insertSubview(background, atIndex: 0)
         
         //移除底端邊界
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
+        //self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
+        //self.navigationController?.navigationBar.shadowImage = UIImage()
+        //self.navigationItem.title = StudentData.Name
+        self.navigationController?.navigationBar.topItem?.title = StudentData.Name
         
-        ExpandBtn = UIBarButtonItem(image: UIImage(named: "Expand Arrow-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeHeight")
+        ExpandBtn = UIBarButtonItem(image: downArrow, style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeHeight")
         self.navigationItem.rightBarButtonItem = ExpandBtn
         
         PhotoImage.image = StudentData.Photo
@@ -43,11 +55,20 @@ class StudentDetailViewCtrl: UIViewController {
         PhotoImage.layer.borderWidth = 3.0
         PhotoImage.layer.borderColor = UIColor.whiteColor().CGColor
         
+        var tap = UITapGestureRecognizer(target: self, action: "DisplayPhoto")
+        PhotoImage.addGestureRecognizer(tap)
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        SubTitle1.text = StudentData.Name
+        SubTitle2.text = "學號 : \(StudentData.StudentNumber)"
+        SubTitle3.text = StudentData.ClassName + (StudentData.SeatNo == "" ? "" : " " + StudentData.SeatNo + " 號")
+    }
+    
     override func viewDidAppear(animated: Bool) {
-        
+
         SegmentValueChange(self)
     }
     
@@ -80,6 +101,12 @@ class StudentDetailViewCtrl: UIViewController {
         }
     }
     
+    func DisplayPhoto(){
+        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("DisplayViewCtrl") as! DisplayViewCtrl
+        nextView.Image = StudentData.Photo
+        self.navigationController?.pushViewController(nextView, animated: true)
+    }
+    
 //    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
 //        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
 //            println("landscape")
@@ -91,6 +118,7 @@ class StudentDetailViewCtrl: UIViewController {
     func ChangeHeight(){
         SubTitleView.hidden = !SubTitleView.hidden
         Height.constant = SubTitleView.hidden ? 0 : 133
+        ExpandBtn.image = SubTitleView.hidden ? downArrow : upArrow
     }
     
     func ChangeContainerViewContent(vc : UIViewController){

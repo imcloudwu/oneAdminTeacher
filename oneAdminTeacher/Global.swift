@@ -102,7 +102,7 @@ func CommonConnect(dsns:String,con:Connection,vc:UIViewController){
     con.connect(dsns, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
     
     if err != nil{
-        ShowErrorAlert(vc,err,nil)
+        //ShowErrorAlert(vc,err,nil)
     }
 }
 

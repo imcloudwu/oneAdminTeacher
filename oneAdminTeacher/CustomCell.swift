@@ -13,13 +13,19 @@ class StudentCell : UITableViewCell{
     @IBOutlet weak var Photo: UIImageView!
     @IBOutlet weak var Label1: UILabel!
     @IBOutlet weak var Label2: UILabel!
-    @IBOutlet weak var Label3: UILabel!
-    @IBOutlet weak var Label4: UILabel!
     
     override func awakeFromNib() {
         Photo.layer.cornerRadius = Photo.frame.size.width / 2
         Photo.layer.masksToBounds = true
-            
+    }
+}
+
+class StudentBasicInfoCell : UITableViewCell{
+    
+    @IBOutlet weak var Title: UILabel!
+    @IBOutlet weak var Value: UILabel!
+    
+    override func awakeFromNib() {
     }
 }
 
@@ -81,13 +87,13 @@ class ExamScoreMoreInfoItemCell : UITableViewCell{
 
 class ClassCell : UITableViewCell{
     
-    @IBOutlet weak var ClassIcon: UIImageView!
+    @IBOutlet weak var ClassIcon: UILabel!
     @IBOutlet weak var ClassName: UILabel!
+    @IBOutlet weak var Major: UILabel!
     
     override func awakeFromNib() {
-        ClassIcon.layer.cornerRadius = ClassIcon.frame.size.width / 2
-        ClassIcon.layer.masksToBounds = true
-        //
+//        ClassIcon.layer.cornerRadius = 5
+//        ClassIcon.layer.masksToBounds = true
     }
 }
 
