@@ -239,7 +239,7 @@ class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDat
         var rsp = _con.sendRequest("semesterScore.GetStudentSemsScore", bodyContent: "<Request><All></All><RefStudentId>\(StudentData.ID)</RefStudentId></Request>", &err)
         
         if err != nil{
-            ShowErrorAlert(self,err,nil)
+            ShowErrorAlert(self,"取得資料發生錯誤",err.message)
             return retVal
         }
         

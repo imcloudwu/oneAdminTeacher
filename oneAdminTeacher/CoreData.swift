@@ -67,7 +67,7 @@ class CoreData{
             let dsns = obj.valueForKey("dsns") as! String
             let name = obj.valueForKey("name") as! String
             
-            retVal.append(Student(DSNS: dsns,ID: id, ClassName: nil, Name: name, SeatNo: nil, StudentNumber: nil, Gender: nil, MailingAddress: nil, PermanentAddress: nil, ContactPhone: nil, PermanentPhone: nil, CustodianName: nil, FatherName: nil, MotherName: nil, Photo: nil))
+            retVal.append(Student(DSNS: dsns,ID: id, ClassID: nil, ClassName: nil, Name: name, SeatNo: nil, StudentNumber: nil, Gender: nil, MailingAddress: nil, PermanentAddress: nil, ContactPhone: nil, PermanentPhone: nil, CustodianName: nil, FatherName: nil, MotherName: nil, Photo: nil))
             
             //_studentData.append(Student(Photo: UIImage(data: photo), ClassName : class_name, Name: name, Phone: phone))
         }

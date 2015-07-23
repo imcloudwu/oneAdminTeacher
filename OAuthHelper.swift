@@ -96,7 +96,7 @@ public class OAuthHelper {
         return "\(OAuthHelper.ServiceExchangeAccessToken)?grant_type=authorization_code&client_id=\(self.clientID)&client_secret=\(self.clientSecret)&redirect_uri=\(self.redirectUrl)&code=\(code)"
     }
     
-    init(clientId cid: String, clientSecret cs: String, redirectUrl ru: String = "http://blank", scope s: String = "User.Mail,User.BasicInfo,1Campus.Notification.Read,1Campus.Notification.Send,*:sakura") {
+    init(clientId cid: String, clientSecret cs: String, redirectUrl ru: String = "http://_blank", scope s: String = "User.Mail,User.BasicInfo,1Campus.Notification.Read,1Campus.Notification.Send,*:sakura") {
         self.client_id = cid
         self.client_secret = cs
         self.redirectUrl = ru

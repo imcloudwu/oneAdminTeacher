@@ -13,6 +13,8 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        HttpClient.TrustServerList.insert("1campus.net")
+        
         progressTimer = ProgressTimer(progressBar: ProgressBar)
         
         let reloadBtn =  UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "showLoginView")
@@ -33,7 +35,13 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
     }
     
     func showLoginView(){
-        let target = "https://auth.ischool.com.tw/oauth/authorize.php?client_id=\(Global.clientID)&response_type=code&state=redirect_uri%3A%2F&redirect_uri=http://blank&lang=zh-tw"
+//        let target = "https://auth.ischool.com.tw/oauth/authorize.php?client_id=\(Global.clientID)&response_type=code&state=redirect_uri%3A%2F&redirect_uri=http://＿blank&lang=zh-tw&scope=User.Mail,User.BasicInfo,1Campus.Notification.Read,1Campus.Notification.Send,*:sakura,*:ischool.teacher.app"
+        
+        let scope = "User.Mail,User.BasicInfo,1Campus.Notification.Read,1Campus.Notification.Send,*:sakura,*:ischool.teacher.app"
+        
+        let target = "https://auth.ischool.com.tw/oauth/authorize.php?client_id=\(Global.clientID)&response_type=code&state=http://_blank&redirect_uri=http://_blank&scope=\(scope)"
+        
+//        let target = "https://auth.ischool.com.tw/oauth/authorize.php?client_id=\(Global.clientID)&response_type=code&state=http://_blank&redirect_uri=http://_blank&scope=User.Mail,User.BasicInfo,*:ischool.teacher.app"
         
         //載入登入頁面
         var urlobj = NSURL(string: target)
@@ -77,7 +85,7 @@ class LoginViewCtrl: UIViewController,UIWebViewDelegate {
     
     func GetCodeFromError(error: NSError) -> String?{
         if let url = error.userInfo?["NSErrorFailingURLStringKey"] as? String{
-            if let range = url.rangeOfString("http://blank/?state=redirect_uri%3A%2F&code="){
+            if let range = url.rangeOfString("http://_blank/?state=http%3A%2F%2F_blank&code="){
                 var code = url
                 code.removeRange(range)
                 

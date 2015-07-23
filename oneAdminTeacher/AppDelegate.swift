@@ -8,6 +8,14 @@
 
 import UIKit
 import CoreData
+import Bolts
+import Parse
+
+// If you want to use any of the UI components, uncomment this line
+// import ParseUI
+
+// If you want to use Crash Reporting - uncomment this line
+import ParseCrashReporting
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,8 +41,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         centerContainer = MMDrawerController(centerViewController: centerViewController, leftDrawerViewController: leftViewController,rightDrawerViewController:nil)
         
-        centerContainer!.openDrawerGestureModeMask = MMOpenDrawerGestureMode.PanningCenterView
-        centerContainer!.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.PanningCenterView | MMCloseDrawerGestureMode.TapCenterView
+        //centerContainer!.openDrawerGestureModeMask = MMOpenDrawerGestureMode.PanningCenterView
+        //centerContainer!.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.PanningCenterView | MMCloseDrawerGestureMode.TapCenterView
         //centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.TapCenterView
         
         //centerContainer?.showsShadow = true
@@ -43,9 +51,145 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window!.rootViewController = centerContainer
         window!.makeKeyAndVisible()
         
+        // Enable storing and querying data from Local Datastore.
+        // Remove this line if you don't want to use Local Datastore features or want to use cachePolicy.
+        Parse.enableLocalDatastore()
+        
+        // ****************************************************************************
+        // Uncomment this line if you want to enable Crash Reporting
+        // ParseCrashReporting.enable()
+        //
+        // Uncomment and fill in with your Parse credentials:
+        Parse.setApplicationId("uXQNetksE9RFTbKz42Ly0MwftTUZqYT4zi9ggoK2", clientKey: "P2eFZ3VOYASviKsFpIsw6dQYRkIQ31zlHNWv6PV6")
+        //
+        // If you are using Facebook, uncomment and add your FacebookAppID to your bundle's plist as
+        // described here: https://developers.facebook.com/docs/getting-started/facebook-sdk-for-ios/
+        // Uncomment the line inside ParseStartProject-Bridging-Header and the following line here:
+        // PFFacebookUtils.initializeFacebook()
+        // ****************************************************************************
+        
+        PFUser.enableAutomaticUser()
+        
+        let defaultACL = PFACL();
+        
+        // If you would like all objects to be private by default, remove this line.
+        defaultACL.setPublicReadAccess(true)
+        
+        PFACL.setDefaultACL(defaultACL, withAccessForCurrentUser:true)
+        
+        if application.applicationState != UIApplicationState.Background {
+            // Track an app open here if we launch with a push, unless
+            // "content_available" was used to trigger a background push (introduced in iOS 7).
+            // In that case, we skip tracking here to avoid double counting the app-open.
+            
+            let preBackgroundPush = !application.respondsToSelector("backgroundRefreshStatus")
+            let oldPushHandlerOnly = !self.respondsToSelector("application:didReceiveRemoteNotification:fetchCompletionHandler:")
+            var noPushPayload = false;
+            if let options = launchOptions {
+                noPushPayload = options[UIApplicationLaunchOptionsRemoteNotificationKey] != nil;
+            }
+            if (preBackgroundPush || oldPushHandlerOnly || noPushPayload) {
+                PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
+            }
+        }
+        if application.respondsToSelector("registerUserNotificationSettings:") {
+            let userNotificationTypes = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+            let settings = UIUserNotificationSettings(forTypes: userNotificationTypes, categories: nil)
+            application.registerUserNotificationSettings(settings)
+            application.registerForRemoteNotifications()
+        } else {
+            //let types = UIRemoteNotificationType.Badge | UIRemoteNotificationType.Alert | UIRemoteNotificationType.Sound
+            //application.registerForRemoteNotificationTypes(types)
+        }
+
         return true
     }
     
+    //--------------------------------------
+    // MARK: Push Notifications
+    //--------------------------------------
+    
+    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        let installation = PFInstallation.currentInstallation()
+        installation.setDeviceTokenFromData(deviceToken)
+        installation.saveInBackground()
+        
+        PFPush.subscribeToChannelInBackground("") { (succeeded: Bool, error: NSError?) in
+            if succeeded {
+                println("ParseStarterProject successfully subscribed to push notifications on the broadcast channel.");
+            } else {
+                println("ParseStarterProject failed to subscribe to push notifications on the broadcast channel with error = %@.", error)
+            }
+        }
+    }
+    
+    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+        if error.code == 3010 {
+            println("Push notifications are not supported in the iOS Simulator.")
+        } else {
+            println("application:didFailToRegisterForRemoteNotificationsWithError: %@", error)
+        }
+    }
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        PFPush.handlePush(userInfo)
+        if application.applicationState == UIApplicationState.Inactive {
+            PFAnalytics.trackAppOpenedWithRemoteNotificationPayload(userInfo)
+        }
+    }
+
+    
+//    //--------------------------------------
+//    // MARK: Push Notifications
+//    //--------------------------------------
+//    
+//    func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+//        let installation = PFInstallation.currentInstallation()
+//        installation.setDeviceTokenFromData(deviceToken)
+//        installation.saveInBackground()
+//        
+////        if let dt = installation.deviceToken {
+////            //println("DeviceToken：\(installation.deviceToken!)")
+////            CurrentUser.notifyService.setup(deviceToken: installation.deviceToken!, accessToken: CurrentUser.accessToken)
+////            CurrentUser.notifyService.register()
+////        }
+//        
+//        //使用 1Campus 服務的話，就不需要 Channel 功能。
+//        PFPush.subscribeToChannelInBackground("", block: { (succeeded: Bool, error: NSError?) -> Void in
+//            if succeeded {
+//                println("ParseStarterProject successfully subscribed to push notifications on the broadcast channel.");
+//            } else {
+//                println("ParseStarterProject failed to subscribe to push notifications on the broadcast channel with error = %@.", error)
+//            }
+//        })
+//    }
+//    
+//    func application(application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: NSError) {
+//        if error.code == 3010 {
+//            println("Push notifications are not supported in the iOS Simulator.")
+//        } else {
+//            println("application:didFailToRegisterForRemoteNotificationsWithError: \(error)")
+//        }
+//    }
+//    
+//    ///////////////////////////////////////////////////////////
+//    // Uncomment this method if you want to use Push Notifications with Background App Refresh
+//    ///////////////////////////////////////////////////////////
+//    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject], fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+//        
+//        //這個func可以顯示推播訊息
+//        PFPush.handlePush(userInfo)
+//        
+////        if application.applicationState == UIApplicationState.Inactive {
+////            PFAnalytics.trackAppOpenedWithRemoteNotificationPayload(userInfo)
+////        }
+////        
+////        //App開啟狀態若收到推播進行畫面更新
+////        if application.applicationState == UIApplicationState.Active {
+////            Global.Callback()
+////        }
+//    }
+//    
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.

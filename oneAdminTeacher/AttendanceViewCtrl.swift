@@ -95,7 +95,7 @@ class AttendanceViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         var rsp = _con.sendRequest("attendance.GetStudentAttendance", bodyContent: "<Request><RefStudentId>\(StudentData.ID)</RefStudentId></Request>", &err)
         
         if err != nil{
-            ShowErrorAlert(self,err,nil)
+            ShowErrorAlert(self,"取得資料發生錯誤",err.message)
             return retVal
         }
         

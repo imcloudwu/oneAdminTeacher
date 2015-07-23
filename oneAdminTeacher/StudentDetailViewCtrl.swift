@@ -18,6 +18,7 @@ class StudentDetailViewCtrl: UIViewController {
     @IBOutlet weak var Height: NSLayoutConstraint!
     @IBOutlet weak var EmbedView: UIView!
     @IBOutlet weak var Segment: UISegmentedControl!
+    @IBOutlet weak var SegmentHeight: NSLayoutConstraint!
     
     @IBOutlet weak var PhotoImage: UIImageView!
     
@@ -27,6 +28,12 @@ class StudentDetailViewCtrl: UIViewController {
     var ExpandBtn : UIBarButtonItem!
     
     var StudentData : Student!
+    
+    var IsClassStudent = true
+    
+    var mustFlipPhoto = true
+    
+    var lastSegmentIndex = -1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +55,7 @@ class StudentDetailViewCtrl: UIViewController {
         ExpandBtn = UIBarButtonItem(image: downArrow, style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeHeight")
         self.navigationItem.rightBarButtonItem = ExpandBtn
         
-        PhotoImage.image = StudentData.Photo
+        PhotoImage.image = nil
         PhotoImage.layer.cornerRadius = PhotoImage.frame.size.width / 2
         PhotoImage.layer.masksToBounds = true
         
@@ -57,6 +64,11 @@ class StudentDetailViewCtrl: UIViewController {
         
         var tap = UITapGestureRecognizer(target: self, action: "DisplayPhoto")
         PhotoImage.addGestureRecognizer(tap)
+        
+        if !IsClassStudent{
+            Segment.hidden = true
+            SegmentHeight.constant = 0
+        }
         
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -68,8 +80,26 @@ class StudentDetailViewCtrl: UIViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
-
-        SegmentValueChange(self)
+        
+        if mustFlipPhoto{
+            UIView.transitionWithView(PhotoImage, duration: 1, options: UIViewAnimationOptions.TransitionFlipFromTop, animations: { () -> Void in
+                self.PhotoImage.image = self.StudentData.Photo
+                }) { (Bool) -> Void in
+                    self.mustFlipPhoto = false
+            }
+        }
+        
+        if Segment.selectedSegmentIndex == lastSegmentIndex{
+            return
+        }
+        
+        if self.IsClassStudent{
+            self.SegmentValueChange(self)
+        }
+        else{
+            let contentView = self.storyboard?.instantiateViewControllerWithIdentifier("CourseScoreViewCtrl") as! CourseScoreViewCtrl
+            self.ChangeContainerViewContent(contentView)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -80,7 +110,7 @@ class StudentDetailViewCtrl: UIViewController {
     @IBAction func SegmentValueChange(sender: AnyObject) {
         
         if Segment.selectedSegmentIndex == 0{
-            var contentView = self.storyboard?.instantiateViewControllerWithIdentifier("studentInfoViewCtrl") as! StudentInfoViewCtrl
+            let contentView = self.storyboard?.instantiateViewControllerWithIdentifier("studentInfoViewCtrl") as! StudentInfoViewCtrl
             ChangeContainerViewContent(contentView)
         }
         else if Segment.selectedSegmentIndex == 1{
@@ -102,6 +132,7 @@ class StudentDetailViewCtrl: UIViewController {
     }
     
     func DisplayPhoto(){
+        lastSegmentIndex = Segment.selectedSegmentIndex
         let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("DisplayViewCtrl") as! DisplayViewCtrl
         nextView.Image = StudentData.Photo
         self.navigationController?.pushViewController(nextView, animated: true)

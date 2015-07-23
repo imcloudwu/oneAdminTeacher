@@ -63,8 +63,13 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
+        
         let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("StudentDetailViewCtrl") as! StudentDetailViewCtrl
         nextView.StudentData = _displayData[indexPath.row]
+        
+        if ClassData.Major != "班導師"{
+            nextView.IsClassStudent = false
+        }
         
         self.navigationController?.pushViewController(nextView, animated: true)
     }
@@ -76,7 +81,14 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
             CommonConnect(self.ClassData.AccessPoint, self._con, self)
-            self._studentData = self.GetStudentData()
+            
+            if self.ClassData.Major == "班導師"{
+                self._studentData = self.GetClassStudentData()
+            }
+            else{
+                self._studentData = self.GetCourseStudentData()
+            }
+            
             self._displayData = self._studentData
             
             dispatch_async(dispatch_get_main_queue(), {
@@ -86,7 +98,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
         })
     }
     
-    func GetStudentData() -> [Student]{
+    func GetClassStudentData() -> [Student]{
         
         var err : DSFault!
         var nserr : NSError?
@@ -98,7 +110,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
         //println(rsp)
         
         if err != nil{
-            ShowErrorAlert(self,err,nil)
+            ShowErrorAlert(self,"取得資料發生錯誤",err.message)
             return retVal
         }
         
@@ -122,7 +134,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
                 let motherName = stu["MotherName"].stringValue
                 let freshmanPhoto = GetImageFromBase64String(stu["FreshmanPhoto"].stringValue, defaultImg: UIImage(named: "User-100.png"))
                 
-                let stuItem = Student(DSNS: ClassData.AccessPoint,ID: studentID, ClassName: className, Name: studentName, SeatNo: seatNo, StudentNumber: studentNumber, Gender: gender, MailingAddress: mailingAddress, PermanentAddress: permanentAddress, ContactPhone: contactPhone, PermanentPhone: permanentPhone, CustodianName: custodianName, FatherName: fatherName, MotherName: motherName, Photo: freshmanPhoto)
+                let stuItem = Student(DSNS: ClassData.AccessPoint,ID: studentID, ClassID: ClassData.ID, ClassName: className, Name: studentName, SeatNo: seatNo, StudentNumber: studentNumber, Gender: gender, MailingAddress: mailingAddress, PermanentAddress: permanentAddress, ContactPhone: contactPhone, PermanentPhone: permanentPhone, CustodianName: custodianName, FatherName: fatherName, MotherName: motherName, Photo: freshmanPhoto)
                 
                 retVal.append(stuItem)
             }
@@ -130,6 +142,44 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
         
         retVal.sort{ $0.SeatNo.toInt() < $1.SeatNo.toInt() }
 
+        return retVal
+    }
+    
+    func GetCourseStudentData() -> [Student]{
+        
+        var err : DSFault!
+        var nserr : NSError?
+        
+        var retVal = [Student]()
+        
+        var rsp = _con.sendRequest("main.GetCourseStudent", bodyContent: "<Request><All></All><CourseID>\(ClassData.ID)</CourseID></Request>", &err)
+        
+        //println(rsp)
+        
+        if err != nil{
+            ShowErrorAlert(self,"取得資料發生錯誤",err.message)
+            return retVal
+        }
+        
+        let xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+        
+        if let students = xml?.root["Response"]["Student"].all {
+            for stu in students{
+                //println(stu.xmlString)
+                let studentID = stu["StudentID"].stringValue
+                let className = stu["ClassName"].stringValue
+                let studentName = stu["StudentName"].stringValue
+                let seatNo = stu["SeatNo"].stringValue
+                let studentNumber = stu["StudentNumber"].stringValue
+                let gender = stu["Gender"].stringValue
+                let freshmanPhoto = GetImageFromBase64String(stu["FreshmanPhoto"].stringValue, defaultImg: UIImage(named: "User-100.png"))
+                
+                let stuItem = Student(DSNS: ClassData.AccessPoint,ID: studentID, ClassID : ClassData.ID, ClassName: className, Name: studentName, SeatNo: seatNo, StudentNumber: studentNumber, Gender: gender, MailingAddress: "", PermanentAddress: "", ContactPhone: "", PermanentPhone: "", CustodianName: "", FatherName: "", MotherName: "", Photo: freshmanPhoto)
+                
+                retVal.append(stuItem)
+            }
+        }
+        
         return retVal
     }
     
@@ -149,6 +199,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
 struct Student : Equatable{
     var DSNS : String!
     var ID : String!
+    var ClassID : String!
     var ClassName : String!
     var Name : String!
     var SeatNo : String!

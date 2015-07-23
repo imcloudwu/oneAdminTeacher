@@ -150,7 +150,7 @@ class DisciplineViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSo
         var rsp = _con.sendRequest("discipline.GetStudentDiscipline", bodyContent: "<Request><RefStudentId>\(StudentData.ID)</RefStudentId></Request>", &err)
         
         if err != nil{
-            ShowErrorAlert(self,err,nil)
+            ShowErrorAlert(self,"取得資料發生錯誤",err.message)
             return retVal
         }
         

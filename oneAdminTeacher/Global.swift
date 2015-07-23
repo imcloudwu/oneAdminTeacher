@@ -10,9 +10,9 @@ import Foundation
 import UIKit
 
 public class Global{
-    //目前跟南港app是同一組
-    static var clientID = "8e306edeffab96c8bdc6c8635cd54b9e"
-    static var clientSecret = "b6b23657bfc3fc7dbf1014712308b005cae629b62376fac5f5a01632df91574e"
+    //跟android使用同一組
+    static var clientID = "9403ec217a19a849d498a5c18909bf38"
+    static var clientSecret = "40654f9b8d2ddbf54d8f3059c2d70cd80d4e7e0fa3094d5b19305f945a38f025"
     static var AccessToken : String!
     static var RefreshToken : String!
     static var DsnsList : [DsnsItem]!
@@ -21,6 +21,7 @@ public class Global{
     static var CurrentStudent : Student!
     static var CountProgressTime = [ProgressTimer]()
     static var ClassList : [ClassItem]!
+    static var Alert : UIAlertController!
     
     static func DeleteStudent(student:Student){
         var newData = [Student]()
@@ -76,7 +77,7 @@ class ProgressTimer : NSObject{
         
         limitTime++
         
-        if limitTime > 200{
+        if limitTime > 1000{
             StopProgress()
             return
         }
@@ -102,18 +103,30 @@ func CommonConnect(dsns:String,con:Connection,vc:UIViewController){
     con.connect(dsns, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
     
     if err != nil{
-        //ShowErrorAlert(vc,err,nil)
+        //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
     }
 }
 
-func ShowErrorAlert(vc:UIViewController,err:DSFault,callback:(() -> ())!){
-    let alert = UIAlertController(title: "錯誤", message: err.message, preferredStyle: UIAlertControllerStyle.Alert)
-    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-        if callback != nil{
-            callback()
-        }
-    }))
-    vc.presentViewController(alert, animated: true, completion: nil)
+func ShowErrorAlert(vc:UIViewController,title:String,msg:String){
+    
+    if Global.Alert == nil{
+        Global.Alert = UIAlertController(title: "", message: "", preferredStyle: UIAlertControllerStyle.Alert)
+        Global.Alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+    }
+    
+    Global.Alert.title = title
+    Global.Alert.message = msg
+    
+//    let alert = UIAlertController(title: title, message: msg, preferredStyle: UIAlertControllerStyle.Alert)
+//    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+//        if callback != nil{
+//            callback()
+//        }
+//    }))
+    
+    
+    vc.presentViewController(Global.Alert, animated: true, completion: nil)
+    
 }
 
 //整理出資料的學年度學期並回傳
@@ -153,6 +166,20 @@ func ChangeContentView(vc:UIViewController){
 //        app.centerContainer?.setCenterViewController(<#newCenterViewController: UIViewController!#>, withFullCloseAnimation: <#Bool#>, completion: <#((Bool) -> Void)!##(Bool) -> Void#>)
 //    })
     //app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
+}
+
+func EnableSideMenu(){
+    var app = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    app.centerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.PanningCenterView
+    app.centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.PanningCenterView | MMCloseDrawerGestureMode.TapCenterView
+}
+
+func DisableSideMenu(){
+    var app = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    app.centerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.None
+    app.centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.None
 }
 
 

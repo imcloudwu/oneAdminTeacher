@@ -62,7 +62,7 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath){
         
         if Global.CurrentStudent == nil{
-            ShowErrorAlert(self, DSFault(msg: "請先選擇一名學生再進行查詢"),nil)
+            ShowErrorAlert(self, "錯誤","請先選擇一名學生再進行查詢")
             return
         }
         
@@ -97,7 +97,7 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
             self.navigationController?.pushViewController(nextView, animated: true)
             
         default:
-            ShowErrorAlert(self, DSFault(msg: "這功能尚未開放呦"),nil)
+            ShowErrorAlert(self, "錯誤","這功能尚未開放呦")
         }
     }
     

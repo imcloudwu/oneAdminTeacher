@@ -14,7 +14,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
     
-    var progressTimer : ProgressTimer!
+    //var progressTimer : ProgressTimer!
     var refreshControl : UIRefreshControl!
     
     var _ClassList = [ClassItem]()
@@ -42,7 +42,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         self.navigationItem.title = "我的班級"
         self.navigationController?.interactivePopGestureRecognizer.enabled = false
         
-        progressTimer = ProgressTimer(progressBar: progress)
+        //progressTimer = ProgressTimer(progressBar: progress)
         
         if Global.ClassList != nil{
             _ClassList = Global.ClassList
@@ -97,7 +97,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                 
                 var con = Connection()
                 CommonConnect(dsns.AccessPoint, con, self)
-                tmpList += self.GetClassData(con)
+                tmpList += self.GetData(con)
                 
                 dispatch_async(dispatch_get_main_queue(), {
                     
@@ -141,12 +141,22 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
 //        })
     }
     
+    func GetData(con:Connection) -> [ClassItem]{
+        
+        var retVal = [ClassItem]()
+        
+        retVal += GetClassData(con)
+        retVal += GetCourseData(con)
+        
+        return retVal
+    }
+    
     func GetClassData(con:Connection) -> [ClassItem]{
+        
+        var retVal = [ClassItem]()
         
         var err : DSFault!
         var nserr : NSError?
-        
-        var retVal = [ClassItem]()
         
         var rsp = con.sendRequest("main.GetMyTutorClasses", bodyContent: "", &err)
         
@@ -169,16 +179,54 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
             }
         }
         
-        rsp = con.sendRequest("main.GetMyCourseClasses", bodyContent: "", &err)
+        return retVal
+    }
+    
+    func GetCourseData(con:Connection) -> [ClassItem]{
+        
+        var retVal = [ClassItem]()
+        
+        var err : DSFault!
+        var nserr : NSError?
+        
+        var schoolYear = ""
+        var semester = ""
+        
+        //GetSemester first
+        var rsp = con.sendRequest("main.GetCurrentSemester", bodyContent: "", &err)
+        
+        if err != nil{
+            //ShowErrorAlert(self,err,nil)
+            return retVal
+        }
+        
+        var xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+        
+        if let sy = xml?.root["Response"]["SchoolYear"].first?.stringValue{
+            schoolYear = sy
+        }
+        
+        if let sm = xml?.root["Response"]["Semester"].first?.stringValue{
+            semester = sm
+        }
+        
+        //GetCourseData
+        rsp = con.sendRequest("main.GetMyCourses", bodyContent: "<Request><All></All><SchoolYear>\(schoolYear)</SchoolYear><Semester>\(semester)</Semester></Request>", &err)
+        
+        if err != nil{
+            //ShowErrorAlert(self,err,nil)
+            return retVal
+        }
+        
         xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
         
         if let classes = xml?.root["ClassList"]["Class"].all {
             for cls in classes{
-                let ClassID = cls["ClassID"].stringValue
-                let ClassName = cls["ClassName"].stringValue
+                let CourseID = cls["CourseID"].stringValue
+                let CourseName = cls["CourseName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課老師"))
+                retVal.append(ClassItem(ID: CourseID, ClassName: CourseName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課老師"))
             }
         }
         
@@ -247,15 +295,20 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         cell.ClassName.text = data.ClassName
         cell.Major.text = data.Major
         
-        //字串擷取
-        let subString = (data.ClassName as NSString).substringToIndex(1)
-        cell.ClassIcon.text = subString
-        
         if data.Major == "班導師"{
             cell.ClassIcon.backgroundColor = redColor
         }
         else{
             cell.ClassIcon.backgroundColor = blueColor
+        }
+        
+        //字串擷取
+        if (data.ClassName as NSString).length > 0{
+            let subString = (data.ClassName as NSString).substringToIndex(1)
+            cell.ClassIcon.text = subString
+        }
+        else{
+            cell.ClassIcon.text = ""
         }
         
         return cell

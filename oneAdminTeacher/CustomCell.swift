@@ -97,6 +97,16 @@ class ClassCell : UITableViewCell{
     }
 }
 
+class MessageCell : UITableViewCell{
+    
+    @IBOutlet weak var Title: UILabel!
+    @IBOutlet weak var Content: UILabel!
+    @IBOutlet weak var Date: UILabel!
+    
+    override func awakeFromNib() {
+    }
+}
+
 /*
 class AbsentCell : UITableViewCell{
     

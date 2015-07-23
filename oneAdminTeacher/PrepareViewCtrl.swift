@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Parse
 
 class PrepareViewCtrl: UIViewController {
     
@@ -12,6 +13,7 @@ class PrepareViewCtrl: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
@@ -40,8 +42,16 @@ class PrepareViewCtrl: UIViewController {
                             }
                         }
                         
-                        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
-                        ChangeContentView(nextView)
+                        self.statusLabel.text = "註冊裝置..."
+                        
+                        self.RegisteDeviceTo1Campus({ () -> () in
+                            
+                            EnableSideMenu()
+                            
+                            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
+                            ChangeContentView(nextView)
+                        })
+                        
                         //self.presentViewController(nextView, animated: true, completion: nil)
                     })
                 })
@@ -67,6 +77,25 @@ class PrepareViewCtrl: UIViewController {
         
         //println("AccessToken = \(Global.AccessToken)")
         //println("RefreshToken = \(Global.RefreshToken)")
+    }
+    
+    func RegisteDeviceTo1Campus(callback:() -> ()){
+        if let deviceToken = PFInstallation.currentInstallation().deviceToken{
+            let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(deviceToken)\"}"
+            
+            //println("https://1campus.net/notification/device/api/post/token/" + Global.AccessToken)
+            
+            HttpClient.Post("https://1campus.net/notification/device/api/post/token/" + Global.AccessToken, json: req, successCallback: { (response) -> Void in
+                println("success")
+                
+                callback()
+                
+                }, errorCallback: { (error) -> Void in
+                    println("failed")
+                    
+                    callback()
+                }, prepareCallback: nil)
+        }
     }
     
     func GetDsnsList(){
