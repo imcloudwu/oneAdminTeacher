@@ -12,7 +12,8 @@ import UIKit
 public class Global{
     static var clientID = "9403ec217a19a849d498a5c18909bf38"
     static var clientSecret = "40654f9b8d2ddbf54d8f3059c2d70cd80d4e7e0fa3094d5b19305f945a38f025"
-    static var MyPhotoLocalPath = NSHomeDirectory().stringByAppendingString("/Documents/myPhoto2.dat")
+    static var ContractName = "1campus.mobile.teacher"
+    static var MyPhotoLocalPath = NSHomeDirectory().stringByAppendingString("/Documents/myPhoto.dat")
     static var MyPhoto : UIImage!
     static var MyName : String!
     static var MyEmail : String!
@@ -120,7 +121,7 @@ func CommonConnect(dsns:String,con:Connection,vc:UIViewController){
     var err: DSFault!
     
     //con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
-    con.connect(dsns, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+    con.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
     
     if err != nil{
         //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
