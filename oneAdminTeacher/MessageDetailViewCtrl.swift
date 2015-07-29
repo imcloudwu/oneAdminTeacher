@@ -30,6 +30,9 @@ class MessageDetailViewCtrl: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //設為已讀
+        NotificationService.SetRead(MessageData.Id, accessToken: Global.AccessToken)
+        
         _dateFormate.dateFormat = "yyyy/MM/dd"
         _timeFormate.dateFormat = "HH:mm"
         
@@ -41,7 +44,8 @@ class MessageDetailViewCtrl: UIViewController {
         
         //self.automaticallyAdjustsScrollViewInsets = false
         
-        self.navigationController?.navigationBar.topItem?.title = MessageData.Title
+        //self.navigationController?.navigationBar.topItem?.title = MessageData.Title
+        self.navigationItem.title = MessageData.Title
         
         ContentBoardView.layer.shadowColor = UIColor.blackColor().CGColor
         ContentBoardView.layer.shadowOffset = CGSizeZero
@@ -53,18 +57,12 @@ class MessageDetailViewCtrl: UIViewController {
         Date.text = _today == date ? _timeFormate.stringFromDate(MessageData.Date) : date
         HyperLink.text = MessageData.Redirect
         
-        var content = ""
-        
-        for i in 0...100{
-            content += MessageData.Content
-        }
-        
         if MessageData.Redirect == ""{
             HyperLinkView.hidden = true
             HyperLinkViewHeight.constant = 0
         }
         
-        Content.text = content
+        Content.text = MessageData.Content
         
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -75,12 +73,21 @@ class MessageDetailViewCtrl: UIViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
+        
+        MessageCoreData.SaveCatchData(MessageData)
+        
         Content.setContentOffset(CGPointMake(0, 0), animated: false)
     }
     
     func OpenUrl(){
-        let url:NSURL = NSURL(string:MessageData.Redirect)!
-        UIApplication.sharedApplication().openURL(url)
+        let alert = UIAlertController(title: "開啟附加連結", message: "您確定要開啟附加連結？開啟前請先確認該網址的安全性，避免損害您的裝置。", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive){ (action) -> Void in
+            let url:NSURL = NSURL(string:self.MessageData.Redirect)!
+            UIApplication.sharedApplication().openURL(url)
+        })
+        
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
 }

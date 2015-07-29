@@ -45,8 +45,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //centerContainer!.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.PanningCenterView | MMCloseDrawerGestureMode.TapCenterView
         //centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.TapCenterView
         
-        //centerContainer?.showsShadow = true
-        centerContainer?.maximumLeftDrawerWidth = 200
+        //centerContainer?.showsShadow = false
+        centerContainer?.maximumLeftDrawerWidth = 250
         
         window!.rootViewController = centerContainer
         window!.makeKeyAndVisible()
@@ -110,8 +110,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //--------------------------------------
     
     func application(application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: NSData) {
+        
         let installation = PFInstallation.currentInstallation()
         installation.setDeviceTokenFromData(deviceToken)
+        Global.MyDeviceToken = installation.deviceToken
         installation.saveInBackground()
         
         PFPush.subscribeToChannelInBackground("") { (succeeded: Bool, error: NSError?) in
@@ -135,6 +137,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PFPush.handlePush(userInfo)
         if application.applicationState == UIApplicationState.Inactive {
             PFAnalytics.trackAppOpenedWithRemoteNotificationPayload(userInfo)
+        }
+        
+        if application.applicationState == UIApplicationState.Active{
+            NotificationService.ExecuteNewMessageDelegate()
         }
     }
 
@@ -206,6 +212,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        if Global.LastLoginDateTime == nil{
+            Global.LastLoginDateTime = NSDate()
+        }
+        
+        let sec = (Global.LastLoginDateTime.timeIntervalSinceNow) * -1
+        
+        if sec > 3500{
+            
+            if let refreshToken = Keychain.load("refreshToken")?.stringValue{
+                Keychain.delete("refreshToken")
+                
+                //println("before : \(Global.AccessToken)")
+                
+                RenewRefreshToken(refreshToken)
+                
+                //println("after : \(Global.AccessToken)")
+                
+                Global.LastLoginDateTime = NSDate()
+            }
+        }
     }
     
     func applicationWillTerminate(application: UIApplication) {

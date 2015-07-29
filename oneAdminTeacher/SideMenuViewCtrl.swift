@@ -8,15 +8,25 @@
 
 import UIKit
 
-class SideMenuViewCtrl: UIViewController {
+class SideMenuViewCtrl: UIViewController{
+    
+    @IBOutlet weak var MyPhoto: UIImageView!
+    @IBOutlet weak var MyName: UILabel!
+    @IBOutlet weak var MyEmail: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        var background = UIImageView(image: UIImage(named: "sidebackground.jpg"))
-        background.frame = self.view.bounds
-        background.contentMode = UIViewContentMode.ScaleToFill
-        self.view.insertSubview(background, atIndex: 0)
+        MyPhoto.layer.cornerRadius = MyPhoto.frame.width / 2
+        MyPhoto.layer.masksToBounds = true
+        
+        MyPhoto.layer.borderWidth = 3.0
+        MyPhoto.layer.borderColor = UIColor.whiteColor().CGColor
+        
+//        var background = UIImageView(image: UIImage(named: "sidebackground.jpg"))
+//        background.frame = self.view.bounds
+//        background.contentMode = UIViewContentMode.ScaleToFill
+//        self.view.insertSubview(background, atIndex: 0)
         
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -26,6 +36,12 @@ class SideMenuViewCtrl: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    override func viewWillAppear(animated: Bool) {
+        MyName.text = Global.MyName
+        MyEmail.text = Global.MyEmail
+        
+        MyPhoto.image = Global.MyPhoto
+    }
     
     @IBAction func Btn1(sender: AnyObject) {
         
@@ -43,9 +59,36 @@ class SideMenuViewCtrl: UIViewController {
     
     @IBAction func Btn3(sender: AnyObject) {
         
-        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("Message") as! UIViewController
-        
-        ChangeContentView(nextView)
+        Logout()
+//        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("Message") as! UIViewController
+//        
+//        ChangeContentView(nextView)
     }
     
+    func Logout(){
+        
+        Global.Reset()
+        
+        DisableSideMenu()
+        
+        NotificationService.UnRegister(Global.MyDeviceToken, accessToken: Global.AccessToken)
+        
+        MessageCoreData.DeleteAll()
+        
+        var storage : NSHTTPCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
+        for cookie in storage.cookies as! [NSHTTPCookie]
+        {
+            storage.deleteCookie(cookie)
+        }
+        NSUserDefaults.standardUserDefaults()
+        Keychain.delete("refreshToken")
+        
+        let backView = self.storyboard?.instantiateViewControllerWithIdentifier("StartView") as! UINavigationController
+        ChangeContentView(backView)
+    }
+    
+}
+
+struct MenuItem {
+    var Name : String
 }

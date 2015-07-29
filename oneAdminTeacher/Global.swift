@@ -10,9 +10,13 @@ import Foundation
 import UIKit
 
 public class Global{
-    //跟android使用同一組
     static var clientID = "9403ec217a19a849d498a5c18909bf38"
     static var clientSecret = "40654f9b8d2ddbf54d8f3059c2d70cd80d4e7e0fa3094d5b19305f945a38f025"
+    static var MyPhotoLocalPath = NSHomeDirectory().stringByAppendingString("/Documents/myPhoto2.dat")
+    static var MyPhoto : UIImage!
+    static var MyName : String!
+    static var MyEmail : String!
+    static var MyDeviceToken : String!
     static var AccessToken : String!
     static var RefreshToken : String!
     static var DsnsList : [DsnsItem]!
@@ -22,6 +26,16 @@ public class Global{
     static var CountProgressTime = [ProgressTimer]()
     static var ClassList : [ClassItem]!
     static var Alert : UIAlertController!
+    
+    static var LastLoginDateTime : NSDate!
+    
+    static func Reset(){
+        MyPhoto = nil
+        ClassList = nil
+        
+        let fm = NSFileManager()
+        fm.removeItemAtPath(MyPhotoLocalPath, error: nil)
+    }
     
     static func DeleteStudent(student:Student){
         var newData = [Student]()
@@ -40,9 +54,15 @@ public class Global{
     }
     
     static func SetAccessTokenAndRefreshToken(token:(accessToken:String,refreshToken:String)!){
+        
+        self.AccessToken = nil
+        self.RefreshToken = nil
+        
         if token != nil{
             self.AccessToken = token.accessToken
             self.RefreshToken = token.refreshToken
+            
+            Keychain.save("refreshToken", data: RefreshToken.dataValue)
         }
     }
 }
@@ -180,6 +200,24 @@ func DisableSideMenu(){
     
     app.centerContainer?.openDrawerGestureModeMask = MMOpenDrawerGestureMode.None
     app.centerContainer?.closeDrawerGestureModeMask = MMCloseDrawerGestureMode.None
+}
+
+func GetAccessTokenAndRefreshToken(code:String){
+    var error : NSError?
+    var oautHelper = OAuthHelper(clientId: Global.clientID, clientSecret: Global.clientSecret)
+    let token = oautHelper.getAccessTokenAndRefreshToken(code, error: &error)
+    //println(token)
+    Global.SetAccessTokenAndRefreshToken(token)
+    
+    //println("AccessToken = \(Global.AccessToken)")
+    //println("RefreshToken = \(Global.RefreshToken)")
+}
+
+func RenewRefreshToken(refreshToken:String){
+    var error : NSError?
+    var oautHelper = OAuthHelper(clientId: Global.clientID, clientSecret: Global.clientSecret)
+    let token = oautHelper.renewAccessToken(refreshToken, error: &error)
+    Global.SetAccessTokenAndRefreshToken(token)
 }
 
 

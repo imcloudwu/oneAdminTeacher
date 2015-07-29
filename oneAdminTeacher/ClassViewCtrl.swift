@@ -19,8 +19,6 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     
     var _ClassList = [ClassItem]()
     
-    var sideMenuBtn : UIBarButtonItem!
-    
     var DsnsResult = [String:Bool]()
     
     let redColor = UIColor(red: 244 / 255, green: 67 / 255, blue: 54 / 255, alpha: 1)
@@ -34,7 +32,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         self.refreshControl.addTarget(self, action: "ReloadData", forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
         
-        sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu Filled-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
+        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu Filled-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
         self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         tableView.delegate = self
@@ -44,8 +42,9 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         
         //progressTimer = ProgressTimer(progressBar: progress)
         
-        if Global.ClassList != nil{
+        if Global.ClassList != nil {
             _ClassList = Global.ClassList
+            //tableView.reloadData()
         }
         
         // Do any additional setup after loading the view, typically from a nib.
@@ -58,7 +57,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     
     override func viewDidAppear(animated: Bool) {
         
-        if Global.ClassList == nil{
+        if _ClassList.count == 0 {
             GetMyClassList()
         }
     }

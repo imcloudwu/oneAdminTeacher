@@ -1,5 +1,5 @@
 //
-//  CoreData.swift
+//  StudentCoreData.swift
 //  oneAdminTeacher
 //
 //  Created by Cloud on 7/7/15.
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CoreData
 
-class CoreData{
+class StudentCoreData{
     //Core Data using
     static func SaveCatchData(student:Student) {
         

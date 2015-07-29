@@ -3,16 +3,24 @@
 //
 
 import UIKit
-import Parse
+//import Parse
 
 class PrepareViewCtrl: UIViewController {
     
     @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var CancelBtn: UIButton!
     
     var code : String!
+    var refreshToken : String!
+    
+    var Success = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        CancelBtn.hidden = true
+        
+        CancelBtn.layer.cornerRadius = 5
+        CancelBtn.layer.masksToBounds = true
         
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -23,9 +31,20 @@ class PrepareViewCtrl: UIViewController {
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
-            self.GetAccessTokenAndRefreshToken(self.code)
+            if self.code != nil{
+                GetAccessTokenAndRefreshToken(self.code)
+            }
+            else if self.refreshToken != nil{
+                RenewRefreshToken(self.refreshToken)
+            }
             
             dispatch_async(dispatch_get_main_queue(), {
+                
+                if Global.AccessToken != nil && Global.RefreshToken != nil{
+                    self.Success = true
+                    self.GetMyAccountInfo()
+                    self.GetMyPhotoFromLocal()
+                }
                 
                 self.statusLabel.text = "取得DSNS清單..."
                 
@@ -35,23 +54,27 @@ class PrepareViewCtrl: UIViewController {
                     
                     dispatch_async(dispatch_get_main_queue(), {
                         
-                        //將本機catch讀出
-                        for student in CoreData.LoadCatchData(){
-                            if !contains(Global.Students, student){
-                                Global.Students.append(student)
+                        if self.Success{
+                            self.statusLabel.text = "註冊裝置..."
+                            
+                            NotificationService.Register(Global.MyDeviceToken, accessToken: Global.AccessToken) { () -> () in
+                                
+                                EnableSideMenu()
+                                
+                                let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
+                                ChangeContentView(nextView)
                             }
+                            
                         }
-                        
-                        self.statusLabel.text = "註冊裝置..."
-                        
-                        self.RegisteDeviceTo1Campus({ () -> () in
+                        else{
+                            self.statusLabel.text = "登錄過程發生失敗..."
                             
-                            EnableSideMenu()
+                            UIView.animateWithDuration(1, animations: { () -> Void in
+                                self.CancelBtn.hidden = false
+                                self.CancelBtn.alpha = 0.8
+                            })
                             
-                            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
-                            ChangeContentView(nextView)
-                        })
-                        
+                        }
                         //self.presentViewController(nextView, animated: true, completion: nil)
                     })
                 })
@@ -64,38 +87,9 @@ class PrepareViewCtrl: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func ChancelLogin(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    func GetAccessTokenAndRefreshToken(code:String){
-        var error : NSError?
-        var oautHelper = OAuthHelper(clientId: Global.clientID, clientSecret: Global.clientSecret)
-        let token = oautHelper.getAccessTokenAndRefreshToken(code, error: &error)
-        //println(token)
-        Global.SetAccessTokenAndRefreshToken(token)
-        
-        //println("AccessToken = \(Global.AccessToken)")
-        //println("RefreshToken = \(Global.RefreshToken)")
-    }
-    
-    func RegisteDeviceTo1Campus(callback:() -> ()){
-        if let deviceToken = PFInstallation.currentInstallation().deviceToken{
-            let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(deviceToken)\"}"
-            
-            //println("https://1campus.net/notification/device/api/post/token/" + Global.AccessToken)
-            
-            HttpClient.Post("https://1campus.net/notification/device/api/post/token/" + Global.AccessToken, json: req, successCallback: { (response) -> Void in
-                println("success")
-                
-                callback()
-                
-                }, errorCallback: { (error) -> Void in
-                    println("failed")
-                    
-                    callback()
-                }, prepareCallback: nil)
-        }
+    @IBAction func CancelLogin(sender: AnyObject) {
+        let backView = self.storyboard?.instantiateViewControllerWithIdentifier("StartView") as! UINavigationController
+        ChangeContentView(backView)
     }
     
     func GetDsnsList(){
@@ -138,6 +132,37 @@ class PrepareViewCtrl: UIViewController {
         
         Global.DsnsList = dsnsList
         
+    }
+    
+    func GetMyAccountInfo(){
+        
+        Global.MyName = "My name"
+        Global.MyEmail = "My e-mail"
+        
+        var rsp = HttpClient.Get("https://auth.ischool.com.tw/services/me.php?access_token=\(Global.AccessToken)")
+        
+        //println(NSString(data: rsp!, encoding: NSUTF8StringEncoding))
+        
+        if let data = rsp{
+            
+            let json = JSON(data: data)
+            
+            Global.MyName = json["firstName"].stringValue + " " + json["lastName"].stringValue
+            Global.MyEmail = json["mail"].stringValue
+        }
+    }
+    
+    func GetMyPhotoFromLocal(){
+        
+        let fm = NSFileManager()
+        
+        if fm.fileExistsAtPath(Global.MyPhotoLocalPath){
+            //Global.MyPhoto = UIImage(named: Global.MyPhotoLocalPath)
+            Global.MyPhoto = UIImage(contentsOfFile: Global.MyPhotoLocalPath)
+        }
+        else{
+            Global.MyPhoto = UIImage(named: "default photo.jpg")
+        }
     }
 }
 

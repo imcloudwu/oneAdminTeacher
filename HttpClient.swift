@@ -88,6 +88,24 @@ public class HttpClient {
         return tokenData
     }
     
+    public class func Put(url:String, body:String, inout err: NSError?) -> NSData? {
+        var response: NSURLResponse?
+        var error: NSError?
+        
+        var request = NSMutableURLRequest()
+        
+        request.HTTPMethod = "PUT"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+        request.URL = NSURL(string: url)
+        
+        var tokenData = NSURLConnection.sendSynchronousRequest(request,returningResponse: &response, error: &error)
+        
+        err = error
+        
+        return tokenData
+    }
+    
     public class func SendRequest(url:String, successCallback: ((response: String) -> Void), errorCallback : ((error: NSError) -> Void)! = nil, prepareCallback: ((request: NSMutableURLRequest) -> Void)! = nil){
         
         var req = NSMutableURLRequest()

@@ -122,7 +122,7 @@ class AdvanceInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
             let action = UIAlertAction(title: stu.DSNS + "_" + stu.Name, style: UIAlertActionStyle.Default, handler: { (act) -> Void in
                 Global.DeleteStudent(stu)
                 //刪除此筆catch
-                CoreData.DeleteStudent(stu)
+                StudentCoreData.DeleteStudent(stu)
                 self.ResetViewTitle()
             })
             

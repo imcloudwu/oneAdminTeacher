@@ -33,6 +33,10 @@ extension String {
         return (self as NSString).doubleValue
     }
     
+    public var dataValue: NSData {
+        return self.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+    }
+    
     public var UrlEncoding: String?{
         return self.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
     }
@@ -77,3 +81,19 @@ extension Double {
         return String(format: "%.\(precision)f", self)
     }
 }
+
+extension NSData {
+    public var stringValue: String {
+        return NSString(data: self, encoding: NSUTF8StringEncoding)! as String
+    }
+}
+
+public func <(a: NSDate, b: NSDate) -> Bool {
+    return a.compare(b) == NSComparisonResult.OrderedAscending
+}
+
+public func ==(a: NSDate, b: NSDate) -> Bool {
+    return a.compare(b) == NSComparisonResult.OrderedSame
+}
+
+extension NSDate: Comparable { }

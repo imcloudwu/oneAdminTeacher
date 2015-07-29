@@ -28,7 +28,7 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         
         //self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "加入清單", style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
         AddBtn = UIBarButtonItem(image: UIImage(named: "Add User-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "AddToList")
-        ParentNavigationItem?.rightBarButtonItems?.append(AddBtn)
+        //ParentNavigationItem?.rightBarButtonItems?.append(AddBtn)
         
         _displayData.append(DisplayItem(Title: "性別", Value: StudentData.Gender, OtherInfo: "", ColorAlarm: false))
         _displayData.append(DisplayItem(Title: "監護人", Value: StudentData.CustodianName, OtherInfo: "", ColorAlarm: false))
@@ -93,7 +93,7 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         LockBtnEnableCheck()
         
         //存入catch
-        CoreData.SaveCatchData(StudentData)
+        StudentCoreData.SaveCatchData(StudentData)
     }
     
     func GetAddress(xmlString:String) -> String{
@@ -122,9 +122,11 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
     }
     
     func DialNumber(phoneNumber:String){
-        let phone = "telprompt://" + phoneNumber
-        let url:NSURL = NSURL(string:phone)!
-        UIApplication.sharedApplication().openURL(url)
+        if let urlEncoding = phoneNumber.UrlEncoding{
+            let phone = "telprompt://" + urlEncoding
+            let url:NSURL = NSURL(string:phone)!
+            UIApplication.sharedApplication().openURL(url)
+        }
     }
     
     func GoogleMap(address:String){
