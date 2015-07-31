@@ -59,14 +59,15 @@ public class NotificationService{
     //反註冊裝置
     static func UnRegister(deviceToken:String?,accessToken:String){
         
-        let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(deviceToken)\"}"
-        
-        let url = NSString(format: unRegisterUrl, accessToken)
-        
-        var error : NSError?
-        
-        HttpClient.Put(url as String, body: req, err: &error)
-        
+        if let dt = deviceToken{
+            let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(dt)\"}"
+            
+            let url = NSString(format: unRegisterUrl, accessToken)
+            
+            var error : NSError?
+            
+            HttpClient.Put(url as String, body: req, err: &error)
+        }
     }
     
     //取得訊息數量
