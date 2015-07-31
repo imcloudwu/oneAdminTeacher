@@ -19,6 +19,7 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
     var _normalFont = UIFont.systemFontOfSize(17.0)
     
     @IBOutlet weak var progress: UIProgressView!
+    @IBOutlet weak var noDataLabel: UILabel!
     
     var progressTimer : ProgressTimer!
     
@@ -35,7 +36,7 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
         
         self.ResetBadge()
         
-        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu Filled-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
+        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
         self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         self.refreshControl = UIRefreshControl()
@@ -90,7 +91,7 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
     }
     
     func SetViewTitle(){
-        self.navigationItem.title = UnReadCount > 0 ? "我的訊息 (\(UnReadCount) 封未讀)" : "我的訊息"
+        self.navigationItem.title = UnReadCount > 0 ? "我的訊息 ( \(UnReadCount) 封未讀 )" : "我的訊息"
     }
     
     func ReloadData(){
@@ -118,6 +119,14 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
             self.UnReadCount = unread
             
             dispatch_async(dispatch_get_main_queue(), {
+                
+                if self.messageData.count > 0{
+                    self.noDataLabel.hidden = true
+                }
+                else{
+                    self.noDataLabel.hidden = false
+                }
+                
                 self.tableView.reloadData()
                 self.SetViewTitle()
                 self.progressTimer.StopProgress()

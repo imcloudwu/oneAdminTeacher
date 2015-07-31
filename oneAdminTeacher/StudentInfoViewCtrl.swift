@@ -133,23 +133,34 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         
         if let urlEncoding = address.UrlEncoding{
             
-            let mapLink = "comgooglemapsurl://www.google.com.tw/maps/place/" + urlEncoding
-            let url:NSURL = NSURL(string:mapLink)!
+            let appleMap = "http://maps.apple.com/?q=\(urlEncoding)"
+            let appleUrl:NSURL = NSURL(string:appleMap)!
             
-            if UIApplication.sharedApplication().canOpenURL(url) {
-                UIApplication.sharedApplication().openURL(url)
-            }
-            else{
-                var alert = UIAlertController(title: "繼續?", message: "需要安裝Google Map才能進行", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (okaction) -> Void in
-                    let itunes = "https://itunes.apple.com/app/id585027354"
-                    let itunesUrl:NSURL = NSURL(string:itunes)!
-                    UIApplication.sharedApplication().openURL(itunesUrl)
-                }))
-                
-                self.presentViewController(alert, animated: true, completion: nil)
-            }
+            let alert = UIAlertController(title: "繼續？", message: "即將開啟Apple map", preferredStyle: UIAlertControllerStyle.Alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (okaction) -> Void in
+                UIApplication.sharedApplication().openURL(appleUrl)
+            }))
+            
+            self.presentViewController(alert, animated: true, completion: nil)
+            
+//            let mapLink = "comgooglemapsurl://www.google.com.tw/maps/place/" + urlEncoding
+//            let url:NSURL = NSURL(string:mapLink)!
+            
+//            if UIApplication.sharedApplication().canOpenURL(url) {
+//                UIApplication.sharedApplication().openURL(url)
+//            }
+//            else{
+//                var alert = UIAlertController(title: "繼續?", message: "需要安裝Google Map才能進行", preferredStyle: UIAlertControllerStyle.Alert)
+//                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+//                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (okaction) -> Void in
+//                    let itunes = "https://itunes.apple.com/app/id585027354"
+//                    let itunesUrl:NSURL = NSURL(string:itunes)!
+//                    UIApplication.sharedApplication().openURL(itunesUrl)
+//                }))
+//                
+//                self.presentViewController(alert, animated: true, completion: nil)
+//            }
         }
     }
     

@@ -57,7 +57,7 @@ public class NotificationService{
     }
     
     //反註冊裝置
-    static func UnRegister(deviceToken:String,accessToken:String){
+    static func UnRegister(deviceToken:String?,accessToken:String){
         
         let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(deviceToken)\"}"
         

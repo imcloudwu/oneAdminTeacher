@@ -22,6 +22,7 @@ class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDat
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
+    @IBOutlet weak var noDataLabel: UILabel!
     
     var ParentNavigationItem : UINavigationItem?
     
@@ -56,7 +57,11 @@ class SemesterScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDat
             
             dispatch_async(dispatch_get_main_queue(), {
                 if self._Semesters.count > 0{
+                     self.noDataLabel.hidden = true
                     self.SetDataToTableView(self._Semesters[0])
+                }
+                else{
+                     self.noDataLabel.hidden = false
                 }
                 
                 self.progressTimer.StopProgress()

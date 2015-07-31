@@ -13,6 +13,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
+    @IBOutlet weak var noDataLabel: UILabel!
     
     //var progressTimer : ProgressTimer!
     var refreshControl : UIRefreshControl!
@@ -32,7 +33,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         self.refreshControl.addTarget(self, action: "ReloadData", forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
         
-        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu Filled-25.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
+        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
         self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         tableView.delegate = self
@@ -106,6 +107,13 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                     
                     if self.AllDone(){
                         self.progress.hidden = true
+                        
+                        if tmpList.count > 0{
+                            self.noDataLabel.hidden = true
+                        }
+                        else{
+                            self.noDataLabel.hidden = false
+                        }
                     }
                     
                     self._ClassList = tmpList
@@ -166,16 +174,18 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         
         var xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
         
-        retVal.append(ClassItem(ID: "header", ClassName: GetSchoolName(con), AccessPoint: "", GradeYear: 0, Major: ""))
-        
         if let classes = xml?.root["ClassList"]["Class"].all {
             for cls in classes{
                 let ClassID = cls["ClassID"].stringValue
                 let ClassName = cls["ClassName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "班導師"))
+                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "導師"))
             }
+        }
+        
+        if retVal.count > 0{
+            retVal.insert(ClassItem(ID: "header", ClassName: GetSchoolName(con), AccessPoint: "", GradeYear: 0, Major: ""), atIndex: 0)
         }
         
         return retVal
@@ -225,7 +235,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                 let CourseName = cls["CourseName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: CourseID, ClassName: CourseName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課老師"))
+                retVal.append(ClassItem(ID: CourseID, ClassName: CourseName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課"))
             }
         }
         
@@ -294,7 +304,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         cell.ClassName.text = data.ClassName
         cell.Major.text = data.Major
         
-        if data.Major == "班導師"{
+        if data.Major == "導師"{
             cell.ClassIcon.backgroundColor = redColor
         }
         else{

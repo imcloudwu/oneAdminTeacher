@@ -15,6 +15,7 @@ class CourseScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
+    @IBOutlet weak var noDataLabel: UILabel!
     
     var progressTimer : ProgressTimer!
     
@@ -58,6 +59,13 @@ class CourseScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
             self._displayData = self.GetScoreData()
             
             dispatch_async(dispatch_get_main_queue(), {
+                
+                if self._displayData.count > 0{
+                   self.noDataLabel.hidden = true
+                }
+                else{
+                    self.noDataLabel.hidden = false
+                }
                 
                 self.tableView.reloadData()
                 self.progressTimer.StopProgress()
@@ -118,11 +126,11 @@ class CourseScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         let courseScore = xml?.root["Response"]["CourseScore"]["Score"].stringValue
         let ordinarilyScore = xml?.root["Response"]["CourseScore"]["Extension"]["Extension"]["OrdinarilyScore"].stringValue
         
-        if !_isJH{
+        if !_isJH && courseScore != ""{
             retVal.append(DisplayItem(Title: "課程成績", Value: courseScore!, OtherInfo: "", ColorAlarm: false))
         }
         
-        if _isJH && !_isHS {
+        if _isJH && !_isHS && ordinarilyScore != ""{
             retVal.append(DisplayItem(Title: "課程平時成績", Value: ordinarilyScore!, OtherInfo: "", ColorAlarm: false))
         }
         

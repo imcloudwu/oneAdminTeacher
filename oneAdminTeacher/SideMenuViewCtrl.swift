@@ -59,7 +59,14 @@ class SideMenuViewCtrl: UIViewController{
     
     @IBAction func Btn3(sender: AnyObject) {
         
-        Logout()
+        let alert = UIAlertController(title: "確認要登出嗎？", message: "", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+            self.Logout()
+        }))
+        
+        self.presentViewController(alert, animated: true, completion: nil)
+        
 //        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("Message") as! UIViewController
 //        
 //        ChangeContentView(nextView)

@@ -67,7 +67,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
         let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("StudentDetailViewCtrl") as! StudentDetailViewCtrl
         nextView.StudentData = _displayData[indexPath.row]
         
-        if ClassData.Major != "班導師"{
+        if ClassData.Major != "導師"{
             nextView.IsClassStudent = false
         }
         
@@ -82,7 +82,7 @@ class StudentViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSourc
             
             CommonConnect(self.ClassData.AccessPoint, self._con, self)
             
-            if self.ClassData.Major == "班導師"{
+            if self.ClassData.Major == "導師"{
                 self._studentData = self.GetClassStudentData()
             }
             else{

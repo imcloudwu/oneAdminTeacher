@@ -32,6 +32,7 @@
 		612123ED1B411525000AA07D /* User-100.png in Resources */ = {isa = PBXBuildFile; fileRef = 612123EC1B411525000AA07D /* User-100.png */; };
 		612123F11B412A3B000AA07D /* Phone-32.png in Resources */ = {isa = PBXBuildFile; fileRef = 612123F01B412A3B000AA07D /* Phone-32.png */; };
 		612123F31B412BBB000AA07D /* StudentInfoViewCtrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 612123F21B412BBB000AA07D /* StudentInfoViewCtrl.swift */; };
+		612D05201B6A3048002E1239 /* Menu-24.png in Resources */ = {isa = PBXBuildFile; fileRef = 612D051F1B6A3048002E1239 /* Menu-24.png */; };
 		6136ED5D1B3D0C560049E632 /* PrepareViewCtrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6136ED5C1B3D0C560049E632 /* PrepareViewCtrl.swift */; };
 		613C58791B2AB1CE00461072 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613C58781B2AB1CE00461072 /* CustomCell.swift */; };
 		613C58811B2AC27D00461072 /* DetailViewCtrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613C58801B2AC27D00461072 /* DetailViewCtrl.swift */; };
@@ -135,6 +136,7 @@
 		612123EC1B411525000AA07D /* User-100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "User-100.png"; sourceTree = "<group>"; };
 		612123F01B412A3B000AA07D /* Phone-32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Phone-32.png"; sourceTree = "<group>"; };
 		612123F21B412BBB000AA07D /* StudentInfoViewCtrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StudentInfoViewCtrl.swift; sourceTree = "<group>"; };
+		612D051F1B6A3048002E1239 /* Menu-24.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Menu-24.png"; path = "icon/Menu-24.png"; sourceTree = SOURCE_ROOT; };
 		6136ED5C1B3D0C560049E632 /* PrepareViewCtrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrepareViewCtrl.swift; sourceTree = "<group>"; };
 		613C58781B2AB1CE00461072 /* CustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		613C58801B2AC27D00461072 /* DetailViewCtrl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewCtrl.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 		61E308D21B2A893400BE36D0 /* icon */ = {
 			isa = PBXGroup;
 			children = (
+				612D051F1B6A3048002E1239 /* Menu-24.png */,
 				61FEC8EA1B678DE80095C52B /* default photo.jpg */,
 				6114855E1B65EB6000B54BBB /* ic_ischool.png */,
 				61DACF641B6220BE001D5633 /* 1CampusTeacher-58.png */,
@@ -459,6 +462,12 @@
 				TargetAttributes = {
 					61F550821B2A768900E26A5D = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = 3E2S2GG75G;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					61F550991B2A768900E26A5D = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -507,6 +516,7 @@
 				6114C8FF1B43A2A800C73E5E /* Diploma-32.png in Resources */,
 				6173AACF1B5791190049EB63 /* Find User Filled-32.png in Resources */,
 				613C58851B2AD92100461072 /* Star Filled-50.png in Resources */,
+				612D05201B6A3048002E1239 /* Menu-24.png in Resources */,
 				6114C9001B43A2A800C73E5E /* Purchase Order-32.png in Resources */,
 				6173AAD31B5791860049EB63 /* Message Filled-32.png in Resources */,
 				61DACF6B1B6220BE001D5633 /* 1CampusTeacher-87.png in Resources */,
@@ -713,6 +723,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -720,6 +732,7 @@
 				INFOPLIST_FILE = oneAdminTeacher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "oneAdminTeacher-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -731,6 +744,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -738,6 +753,7 @@
 				INFOPLIST_FILE = oneAdminTeacher/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_INSTALL_OBJC_HEADER = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "oneAdminTeacher-Bridging-Header.h";
 			};
