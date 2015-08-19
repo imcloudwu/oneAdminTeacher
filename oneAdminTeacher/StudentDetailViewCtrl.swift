@@ -52,7 +52,7 @@ class StudentDetailViewCtrl: UIViewController {
         //self.navigationItem.title = StudentData.Name
         self.navigationController?.navigationBar.topItem?.title = StudentData.Name
         
-        ExpandBtn = UIBarButtonItem(image: downArrow, style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeHeight")
+        ExpandBtn = UIBarButtonItem(image: upArrow, style: UIBarButtonItemStyle.Plain, target: self, action: "ChangeHeight")
         self.navigationItem.rightBarButtonItem = ExpandBtn
         
         PhotoImage.image = nil
