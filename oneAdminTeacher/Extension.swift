@@ -18,6 +18,24 @@ import Foundation
 //    }
 //}
 
+extension Connection{
+    func SendRequest(targetService:String,bodyContent:String,inout _ error: DSFault!) -> String {
+        
+        var e : DSFault!
+        
+        var rsp = self.sendRequest(targetService, bodyContent: bodyContent, &e)
+        
+        if e != nil{
+            self.connect(self.accessPoint, self.targetContract, SecurityToken.createOAuthToken(Global.AccessToken), &error)
+            rsp = self.sendRequest(targetService, bodyContent: bodyContent, &e)
+        }
+        
+        error = e
+        
+        return rsp == nil ? "" : rsp
+    }
+}
+
 //if failed will return 0
 extension String {
     
@@ -63,9 +81,9 @@ extension String {
 extension Double {
     
     //四捨五入到小數點第二位(前一位數是偶數時是五捨六入)
-//    func toString(precision : Int) -> String {
-//        return String(format: "%.\(precision)f", self)
-//    }
+    //    func toString(precision : Int) -> String {
+    //        return String(format: "%.\(precision)f", self)
+    //    }
     
     func Round(precision : Int16) -> Double {
         var x = NSDecimalNumber(string: "\(self)")
@@ -97,3 +115,19 @@ public func ==(a: NSDate, b: NSDate) -> Bool {
 }
 
 extension NSDate: Comparable { }
+
+//extension JSON {
+//    public var arrayStringValue: [String] {
+//        get {
+//            var value = [String]()
+//
+//            for elem in arrayValue{
+//                if !elem.stringValue.isEmpty{
+//                    value.append(elem.stringValue)
+//                }
+//            }
+//
+//            return value
+//        }
+//    }
+//}

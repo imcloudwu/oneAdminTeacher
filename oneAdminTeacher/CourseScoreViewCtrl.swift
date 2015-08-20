@@ -52,7 +52,8 @@ class CourseScoreViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
-            CommonConnect(self.StudentData.DSNS, self._con, self)
+            //CommonConnect(self.StudentData.DSNS, self._con, self)
+            self._con = GetCommonConnect(self.StudentData.DSNS)
             
             self.CheckDSNS()
             

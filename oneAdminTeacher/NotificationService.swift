@@ -14,11 +14,25 @@ public class NotificationService{
     
     private static var getMessageUrl : String = "https://1campus.net/notification/api/get/all/p/%@/token/%@"
     
+    private static var getMessageByIdUrl : String = "https://1campus.net/notification/api/get/id/%@/token/%@"
+    
     private static var getMessageCountUrl : String = "https://1campus.net/notification/api/get/all/count/token/%@"
     
     private static var setReadUrl : String = "https://1campus.net/notification/api/put/read/token/%@"
     
+    private static var sendMessageUrl : String = "https://1campus.net/notification/api/post/token/%@"
+    
+    private static var replyUrl : String = "https://1campus.net/notification/api/put/%@/reply/token/%@"
+    
     private static var newMessageDelegate : (() -> ())?
+    
+    private static var mustReload = false
+    
+    static var NeedReload : Bool{
+        get{
+            return mustReload
+        }
+    }
     
     static func SetNewMessageDelegate(callback:(()->())?){
         newMessageDelegate = callback
@@ -27,7 +41,11 @@ public class NotificationService{
     static func ExecuteNewMessageDelegate(){
         
         if newMessageDelegate != nil{
+            mustReload = false
             newMessageDelegate!()
+        }
+        else{
+            mustReload = true
         }
     }
     
@@ -38,7 +56,7 @@ public class NotificationService{
             let req = "{\"deviceType\": \"ios\",\"deviceToken\": \"\(dt)\"}"
             
             let url = NSString(format: registerUrl, accessToken)
-        
+            
             HttpClient.Post(url as String, json: req, successCallback: { (response) -> Void in
                 //println("success")
                 
@@ -102,6 +120,18 @@ public class NotificationService{
         return NSData()
     }
     
+    //取得指定訊息
+    static func GetMessageById(id:String,accessToken:String) -> NSData{
+        
+        let url = NSString(format: getMessageByIdUrl, id, accessToken)
+        
+        if let data = HttpClient.Get(url as String){
+            return data
+        }
+        
+        return NSData()
+    }
+    
     //設為已讀
     static func SetRead(msgId:String,accessToken:String){
         
@@ -110,5 +140,81 @@ public class NotificationService{
         var error : NSError?
         
         HttpClient.Put(url as String, body: "[\"\(msgId)\"]", err: &error)
+    }
+    
+    //發送訊息
+    static func SendMessage(schoolName:String,type:String,sender:String,redirect:String,msg:String,receivers:[TeacherAccount],options:[String],accessToken:String){
+        
+        var template = ""
+        
+        for receiver in receivers{
+            
+            if receiver == receivers.first{
+                template += "["
+            }
+            
+            if receiver != receivers.last{
+                template += "{\"uuid\":\"\(receiver.UUID)\",\"name\":\"\(receiver.Name)\"},"
+            }
+            else{
+                template += "{\"uuid\":\"\(receiver.UUID)\",\"name\":\"\(receiver.Name)\"}]"
+            }
+            
+        }
+        
+        var optionString = ""
+        var optionTemplate = ""
+        
+        for option in options{
+            if option == options.first{
+                optionString += "["
+            }
+            
+            if option != options.last{
+                optionString += "\"\(option)\","
+            }
+            else{
+                optionString += "\"\(option)\"]"
+            }
+        }
+        
+        if optionString != ""{
+            optionTemplate = ",\"options\": \(optionString)"
+        }
+        
+        //字串取代
+        var replace_msg = msg.stringByReplacingOccurrencesOfString("\n",withString: "\\n")
+        
+        let sampleBody = "{\"message\":\"\(replace_msg)\",\"type\":\"\(type)\"\(optionTemplate),\"sender\":\"\(sender)\",\"redirect\":\"\(redirect)\",\"group\":{\"dsnsname\":\"\(schoolName)\"},\"to\":\(template)}"
+        
+        let url = NSString(format: sendMessageUrl, accessToken)
+        
+        HttpClient.Post(url as String, json: sampleBody, successCallback: { (response) -> Void in
+            //do nothing
+            self.ExecuteNewMessageDelegate()
+            }, errorCallback: { (error) -> Void in
+                //do nothing
+                println(error)
+            }, prepareCallback: nil)
+    }
+    
+    //回覆問卷
+    static func ReplySingle(msgId:String,accessToken:String,answerIndex:Int){
+        
+        let url = NSString(format: replyUrl, msgId, accessToken)
+        
+        var error : NSError?
+        
+        HttpClient.Put(url as String, body: "{ \"reply\": \(answerIndex) }", err: &error)
+    }
+    
+    //回覆問卷
+    static func ReplyMultiple(msgId:String,accessToken:String,answers:[Int]){
+        
+        let url = NSString(format: replyUrl, msgId, accessToken)
+        
+        var error : NSError?
+        
+        HttpClient.Put(url as String, body: "{ \"reply\": \(answers.description) }", err: &error)
     }
 }

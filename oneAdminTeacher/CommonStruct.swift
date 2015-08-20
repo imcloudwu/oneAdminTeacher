@@ -49,3 +49,28 @@ protocol ContainerViewProtocol
     var StudentData : Student! { get set }
     var ParentNavigationItem : UINavigationItem? { get set }
 }
+
+class TeacherAccount : Equatable{
+    var SchoolName : String
+    var Name : String
+    var Account : String
+    var UUID : String
+    
+    init(schoolName:String,name:String,account:String){
+        SchoolName = schoolName
+        Name = name
+        Account = account
+        UUID = ""
+    }
+    
+    //    init(uuid:String){
+    //        SchoolName = ""
+    //        Name = ""
+    //        Account = ""
+    //        UUID = uuid
+    //    }
+}
+
+func ==(lhs: TeacherAccount, rhs: TeacherAccount) -> Bool {
+    return lhs.SchoolName == rhs.SchoolName && lhs.Name == rhs.Name && lhs.Account == rhs.Account
+}

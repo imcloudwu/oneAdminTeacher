@@ -29,14 +29,47 @@ public class Global{
     static var Alert : UIAlertController!
     
     static var LastLoginDateTime : NSDate!
+    static var MySchoolList = [DsnsItem]()
+    static var MyTeacherList = [TeacherAccount]()
+    
+    static var SchoolConnector = [String:Connection]()
+    
+    static var LockQueue = dispatch_queue_create("LockQueue", nil)
     
     static func Reset(){
         MyPhoto = nil
         ClassList = nil
+        MySchoolList = [DsnsItem]()
+        MyTeacherList = [TeacherAccount]()
+        SchoolConnector = [String:Connection]()
         
         let fm = NSFileManager()
         fm.removeItemAtPath(MyPhotoLocalPath, error: nil)
     }
+    
+    //    static func GetTeacherAccountByUUIDs(uuids:[String]) -> [TeacherAccount]{
+    //
+    //        var retVal = [TeacherAccount]()
+    //
+    //        for uuid in uuids{
+    //            if let teacher = GetTeacherAccountByUUID(uuid){
+    //                retVal.append(teacher)
+    //            }
+    //        }
+    //
+    //        return retVal
+    //    }
+    //
+    //    static func GetTeacherAccountByUUID(uuid:String) -> TeacherAccount?{
+    //
+    //        for t in MyTeacherList{
+    //            if t.UUID == uuid{
+    //                return t
+    //            }
+    //        }
+    //
+    //        return nil
+    //    }
     
     static func DeleteStudent(student:Student){
         var newData = [Student]()
@@ -78,7 +111,7 @@ class ProgressTimer : NSObject{
         ProgressBar.hidden = true
         limitTime = 0
     }
-
+    
     func StartProgress(){
         Timer?.invalidate()
         Timer = NSTimer.scheduledTimerWithTimeInterval(0.01667, target: self, selector: "timerCallback", userInfo: nil, repeats: true)
@@ -116,17 +149,64 @@ class ProgressTimer : NSObject{
     }
 }
 
-func CommonConnect(dsns:String,con:Connection,vc:UIViewController){
+func SetCommonConnect(dsns:String,con:Connection){
     
-    var err: DSFault!
-    
-    //con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
-    con.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
-    
-    if err != nil{
-        //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
+    dispatch_sync(Global.LockQueue) {
+        
+        var err: DSFault!
+        
+        con.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
+        Global.SchoolConnector[dsns] = con
     }
 }
+
+func GetCommonConnect(dsns:String) -> Connection{
+    
+    dispatch_sync(Global.LockQueue) {
+        
+        if Global.SchoolConnector[dsns] == nil{
+            
+            var err: DSFault!
+            
+            Global.SchoolConnector[dsns] = Connection()
+            
+            Global.SchoolConnector[dsns]!.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
+            
+            if err != nil{
+                //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
+            }
+        }
+    }
+    
+    return Global.SchoolConnector[dsns]!
+}
+
+//func GetCommonConnect(dsns:String,con:Connection,vc:UIViewController) -> Connection{
+//
+//    dispatch_sync(Global.LockQueue) {
+//
+//        if Global.SchoolConnector[dsns] == nil{
+//
+//            var err: DSFault!
+//
+//            Global.SchoolConnector[dsns] = con
+//
+//            Global.SchoolConnector[dsns]!.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
+//
+//            if err != nil{
+//                //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
+//            }
+//        }
+//    }
+//
+//    return Global.SchoolConnector[dsns]!
+//    //con.connect(Global.CurrentDsns.AccessPoint, "ischool.teacher.app", SecurityToken.createOAuthToken(Global.AccessToken), &err)
+//    //con.connect(dsns, Global.ContractName, SecurityToken.createOAuthToken(Global.AccessToken), &err)
+//
+//    //if err != nil{
+//        //ShowErrorAlert(vc,"錯誤來自:\(dsns)",err.message)
+//    //}
+//}
 
 func ShowErrorAlert(vc:UIViewController,title:String,msg:String){
     
@@ -138,12 +218,12 @@ func ShowErrorAlert(vc:UIViewController,title:String,msg:String){
     Global.Alert.title = title
     Global.Alert.message = msg
     
-//    let alert = UIAlertController(title: title, message: msg, preferredStyle: UIAlertControllerStyle.Alert)
-//    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
-//        if callback != nil{
-//            callback()
-//        }
-//    }))
+    //    let alert = UIAlertController(title: title, message: msg, preferredStyle: UIAlertControllerStyle.Alert)
+    //    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+    //        if callback != nil{
+    //            callback()
+    //        }
+    //    }))
     
     
     vc.presentViewController(Global.Alert, animated: true, completion: nil)
@@ -181,11 +261,11 @@ func ChangeContentView(vc:UIViewController){
     
     app.centerContainer?.setCenterViewController(vc, withCloseAnimation: true, completion: nil)
     //app.centerContainer?.closeDrawerAnimated(true, completion: nil)
-//    app.centerContainer?.closeDrawerAnimated(true, completion: { (finish) -> Void in
-//        app.centerContainer?.centerViewController = vc
-//        
-//        app.centerContainer?.setCenterViewController(<#newCenterViewController: UIViewController!#>, withFullCloseAnimation: <#Bool#>, completion: <#((Bool) -> Void)!##(Bool) -> Void#>)
-//    })
+    //    app.centerContainer?.closeDrawerAnimated(true, completion: { (finish) -> Void in
+    //        app.centerContainer?.centerViewController = vc
+    //
+    //        app.centerContainer?.setCenterViewController(<#newCenterViewController: UIViewController!#>, withFullCloseAnimation: <#Bool#>, completion: <#((Bool) -> Void)!##(Bool) -> Void#>)
+    //    })
     //app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
 }
 
@@ -220,6 +300,127 @@ func RenewRefreshToken(refreshToken:String){
     let token = oautHelper.renewAccessToken(refreshToken, error: &error)
     Global.SetAccessTokenAndRefreshToken(token)
 }
+
+//new solution
+func GetSchoolName(con:Connection) -> String{
+    
+    var schoolName = con.accessPoint
+    
+    var error : DSFault!
+    var nserr : NSError?
+    
+    var rsp = con.SendRequest("main.GetSchoolName", bodyContent: "", &error)
+    
+    let xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+    
+    if let name = xml?.root["Response"]["SchoolName"].first?.stringValue{
+        schoolName = name
+        
+        let di = DsnsItem(name: schoolName, accessPoint: con.accessPoint)
+        
+        if !contains(Global.MySchoolList, di){
+            Global.MySchoolList.append(di)
+        }
+    }
+    
+    
+    //        //encode成功呼叫查詢
+    //        if let encodingName = con.accessPoint.UrlEncoding{
+    //
+    //            var data = HttpClient.Get("http://dsns.1campus.net/campusman.ischool.com.tw/config.public/GetSchoolList?content=%3CRequest%3E%3CMatch%3E\(encodingName)%3C/Match%3E%3CPagination%3E%3CPageSize%3E10%3C/PageSize%3E%3CStartPage%3E1%3C/StartPage%3E%3C/Pagination%3E%3C/Request%3E")
+    //
+    //            if let rsp = data{
+    //
+    //                //println(NSString(data: rsp, encoding: NSUTF8StringEncoding))
+    //
+    //                var nserr : NSError?
+    //
+    //                let xml = AEXMLDocument(xmlData: rsp, error: &nserr)
+    //
+    //                if let name = xml?.root["Response"]["School"]["Title"].stringValue{
+    //                    schoolName = name
+    //                }
+    //            }
+    //        }
+    
+    return schoolName
+}
+
+func GetTeacherAccountItem(account:String) -> TeacherAccount?{
+    
+    if !account.isEmpty{
+        for ta in Global.MyTeacherList{
+            if ta.Account == account{
+                return ta
+            }
+        }
+    }
+    
+    return nil
+}
+
+func GetAllTeacherAccount(schoolName:String,con:Connection){
+    
+    var err : DSFault!
+    var nserr : NSError?
+    
+    var rsp = con.SendRequest("main.GetAllTeacher", bodyContent: "", &err)
+    
+    let xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+    
+    if let teachers = xml?.root["Teachers"]["Teacher"].all{
+        for teacher in teachers{
+            let teacherName = teacher["TeacherName"].stringValue
+            let teacherAccount = teacher["TeacherAccount"].stringValue
+            
+            let teacherItem = TeacherAccount(schoolName: schoolName, name: teacherName, account: teacherAccount)
+            
+            if !contains(Global.MyTeacherList, teacherItem){
+                Global.MyTeacherList.append(teacherItem)
+            }
+        }
+    }
+    
+    //SetTeachersUUID(Global.MyTeacherList)
+}
+
+func SetTeachersUUID(source:[TeacherAccount]){
+    
+    var err : NSError?
+    var emailString = ""
+    
+    for teacher in source{
+        if teacher.Account != "" , let account = teacher.Account.UrlEncoding{
+            if teacher == source.last{
+                emailString += "%22\(account)%22"
+            }
+            else{
+                emailString += "%22\(account)%22" + ","
+            }
+        }
+    }
+    
+    var rsp = HttpClient.Get("https://auth.ischool.com.tw/services/uuidLookup.php?accounts=[\(emailString)]",err: &err)
+    
+    //println(NSString(data: rsp!, encoding: NSUTF8StringEncoding))
+    
+    //null會是空白字串
+    var jsons = JSON(data: rsp!)
+    
+    for teacher in source{
+        teacher.UUID = jsons[teacher.Account].stringValue
+    }
+}
+
+func RegisterForKeyboardNotifications(vc:UIViewController) {
+    let notificationCenter = NSNotificationCenter.defaultCenter()
+    notificationCenter.addObserver(vc,
+        selector: "keyboardWillBeShown:",
+        name: UIKeyboardWillShowNotification,
+        object: nil)
+}
+
+
 
 
 

@@ -96,7 +96,8 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                 
                 var con = Connection()
-                CommonConnect(dsns.AccessPoint, con, self)
+                SetCommonConnect(dsns.AccessPoint, con)
+                //con = CommonConnect(dsns.AccessPoint, con, self)
                 tmpList += self.GetData(con)
                 
                 dispatch_async(dispatch_get_main_queue(), {
@@ -155,6 +156,13 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         retVal += GetClassData(con)
         retVal += GetCourseData(con)
         
+        if retVal.count > 0{
+            
+            let schoolName = GetSchoolName(con)
+            
+            retVal.insert(ClassItem(DSNS: "", ID: "header", ClassName: schoolName, AccessPoint: "", GradeYear: 0, Major: ""), atIndex: 0)
+        }
+        
         return retVal
     }
     
@@ -180,12 +188,8 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                 let ClassName = cls["ClassName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "導師"))
+                retVal.append(ClassItem(DSNS: con.accessPoint, ID: ClassID, ClassName: ClassName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "導師"))
             }
-        }
-        
-        if retVal.count > 0{
-            retVal.insert(ClassItem(ID: "header", ClassName: GetSchoolName(con), AccessPoint: "", GradeYear: 0, Major: ""), atIndex: 0)
         }
         
         return retVal
@@ -235,7 +239,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
                 let CourseName = cls["CourseName"].stringValue
                 let GradeYear = cls["GradeYear"].stringValue.toInt() ?? 0
                 
-                retVal.append(ClassItem(ID: CourseID, ClassName: CourseName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課"))
+                retVal.append(ClassItem(DSNS: con.accessPoint, ID: CourseID, ClassName: CourseName, AccessPoint: con.accessPoint, GradeYear: GradeYear, Major: "授課"))
             }
         }
         
@@ -243,31 +247,31 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
     }
     
     //new solution
-    func GetSchoolName(con:Connection) -> String{
-        
-        var schoolName = ""
-        
-        //encode成功呼叫查詢
-        if let encodingName = con.accessPoint.UrlEncoding{
-            
-            var data = HttpClient.Get("http://dsns.1campus.net/campusman.ischool.com.tw/config.public/GetSchoolList?content=%3CRequest%3E%3CMatch%3E\(encodingName)%3C/Match%3E%3CPagination%3E%3CPageSize%3E10%3C/PageSize%3E%3CStartPage%3E1%3C/StartPage%3E%3C/Pagination%3E%3C/Request%3E")
-            
-            if let rsp = data{
-                
-                //println(NSString(data: rsp, encoding: NSUTF8StringEncoding))
-                
-                var nserr : NSError?
-                
-                let xml = AEXMLDocument(xmlData: rsp, error: &nserr)
-                
-                if let name = xml?.root["Response"]["School"]["Title"].stringValue{
-                    schoolName = name
-                }
-            }
-        }
-        
-        return schoolName
-    }
+//    func GetSchoolName(con:Connection) -> String{
+//        
+//        var schoolName = ""
+//        
+//        //encode成功呼叫查詢
+//        if let encodingName = con.accessPoint.UrlEncoding{
+//            
+//            var data = HttpClient.Get("http://dsns.1campus.net/campusman.ischool.com.tw/config.public/GetSchoolList?content=%3CRequest%3E%3CMatch%3E\(encodingName)%3C/Match%3E%3CPagination%3E%3CPageSize%3E10%3C/PageSize%3E%3CStartPage%3E1%3C/StartPage%3E%3C/Pagination%3E%3C/Request%3E")
+//            
+//            if let rsp = data{
+//                
+//                //println(NSString(data: rsp, encoding: NSUTF8StringEncoding))
+//                
+//                var nserr : NSError?
+//                
+//                let xml = AEXMLDocument(xmlData: rsp, error: &nserr)
+//                
+//                if let name = xml?.root["Response"]["School"]["Title"].stringValue{
+//                    schoolName = name
+//                }
+//            }
+//        }
+//        
+//        return schoolName
+//    }
     
     func AllDone() -> Bool{
         
@@ -303,6 +307,7 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         let cell = tableView.dequeueReusableCellWithIdentifier("ClassCell") as! ClassCell
         cell.ClassName.text = data.ClassName
         cell.Major.text = data.Major
+        cell.classItem = data
         
         if data.Major == "導師"{
             cell.ClassIcon.backgroundColor = redColor
@@ -319,6 +324,12 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         else{
             cell.ClassIcon.text = ""
         }
+        
+        //UILongPressGestureRecognizer
+        var longPress = UILongPressGestureRecognizer(target: self, action: "LongPress:")
+        longPress.minimumPressDuration = 0.5
+        
+        cell.addGestureRecognizer(longPress)
         
         return cell
     }
@@ -341,9 +352,85 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         
         return 60
     }
+    
+    //Mark : Send Message Function
+    func LongPress(sender:UILongPressGestureRecognizer){
+        
+//        if sender.state == UIGestureRecognizerState.Began{
+//            var cell = sender.view as! ClassCell
+//            
+//            let menu = UIAlertController(title: "要對 \(cell.ClassName.text!) 發送訊息嗎?", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+//            
+//            menu.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+//            
+//            menu.addAction(UIAlertAction(title: "給家長們", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+//                
+//                self.SendMessageToClassParents(cell)
+//            }))
+//            
+//            self.presentViewController(menu, animated: true, completion: nil)
+//            
+//        }
+        
+        if sender.state == UIGestureRecognizerState.Began{
+            var cell = sender.view as! ClassCell
+            
+            let menu = UIAlertController(title: "要對 \(cell.ClassName.text!) 的家長們發送訊息嗎?", message: "", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            menu.addAction(UIAlertAction(title: "取消", style: UIAlertActionStyle.Cancel, handler: nil))
+            
+            menu.addAction(UIAlertAction(title: "是", style: UIAlertActionStyle.Destructive, handler: { (action) -> Void in
+                self.SendMessageToClassParents(cell)
+            }))
+            
+            self.presentViewController(menu, animated: true, completion: nil)
+        }
+    }
+    
+    func SendMessageToClassParents(cell : ClassCell){
+        
+        var err : DSFault!
+        let con = GetCommonConnect(cell.classItem.DSNS)
+        
+        var rsp = con.sendRequest("main.GetParent", bodyContent: "<Request><ClassID>\(cell.classItem.ID)</ClassID></Request>", &err)
+        
+        if err != nil{
+            ShowErrorAlert(self, "錯誤", err.message)
+        }
+        else{
+            var nserr : NSError?
+            
+            var xml = AEXMLDocument(xmlData: rsp.dataValue, error: &nserr)
+            
+            var parentAccounts = [TeacherAccount]()
+            
+            if let parents = xml?.root["Response"]["Parent"].all {
+                for parent in parents{
+                    let studentName = parent["StudentName"].stringValue
+                    let studentID = parent["StudentID"].stringValue
+                    let parentAccount = parent["ParentAccount"].stringValue
+                    let className = parent["ClassName"].stringValue
+                    let relationship = parent["Relationship"].stringValue
+                    
+                    var pa = TeacherAccount(schoolName: "", name: studentName + "(" + relationship + ")", account: parentAccount)
+                    parentAccounts.append(pa)
+                }
+            }
+            
+            //發送訊息前會做了
+            //SetTeachersUUID(parentAccounts)
+            
+            let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("OutboxSendViewCtrl") as! OutboxSendViewCtrl
+            nextView.MyTeacherSelector.Teachers = parentAccounts
+            nextView.DataBase = parentAccounts
+            
+            self.navigationController?.pushViewController(nextView, animated: true)
+        }
+    }
 }
 
 struct ClassItem{
+    var DSNS : String
     var ID : String
     var ClassName : String
     var AccessPoint : String
