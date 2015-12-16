@@ -35,6 +35,7 @@ public class NotificationService{
     }
     
     static func SetNewMessageDelegate(callback:(()->())?){
+        
         newMessageDelegate = callback
     }
     
@@ -84,7 +85,11 @@ public class NotificationService{
             
             var error : NSError?
             
-            HttpClient.Put(url as String, body: req, err: &error)
+            do {
+                try HttpClient.Put(url as String, body: req)
+            } catch var error1 as NSError {
+                error = error1
+            }
         }
     }
     
@@ -93,7 +98,7 @@ public class NotificationService{
         
         let url = NSString(format: getMessageCountUrl, accessToken)
         
-        var rsp = HttpClient.Get(url as String)
+        let rsp = try? HttpClient.Get(url as String)
         //println(NSString(data: rsp!, encoding: NSUTF8StringEncoding))
         
         if let data = rsp{
@@ -113,7 +118,7 @@ public class NotificationService{
         
         let url = NSString(format: getMessageUrl, page, accessToken)
         
-        if let data = HttpClient.Get(url as String){
+        if let data = try? HttpClient.Get(url as String){
             return data
         }
         
@@ -125,7 +130,7 @@ public class NotificationService{
         
         let url = NSString(format: getMessageByIdUrl, id, accessToken)
         
-        if let data = HttpClient.Get(url as String){
+        if let data = try? HttpClient.Get(url as String){
             return data
         }
         
@@ -139,7 +144,11 @@ public class NotificationService{
         
         var error : NSError?
         
-        HttpClient.Put(url as String, body: "[\"\(msgId)\"]", err: &error)
+        do {
+            try HttpClient.Put(url as String, body: "[\"\(msgId)\"]")
+        } catch var error1 as NSError {
+            error = error1
+        }
     }
     
     //發送訊息
@@ -183,7 +192,7 @@ public class NotificationService{
         }
         
         //字串取代
-        var replace_msg = msg.stringByReplacingOccurrencesOfString("\n",withString: "\\n")
+        let replace_msg = msg.stringByReplacingOccurrencesOfString("\n",withString: "\\n")
         
         let sampleBody = "{\"message\":\"\(replace_msg)\",\"type\":\"\(type)\"\(optionTemplate),\"sender\":\"\(sender)\",\"redirect\":\"\(redirect)\",\"group\":{\"dsnsname\":\"\(schoolName)\"},\"to\":\(template)}"
         
@@ -194,7 +203,7 @@ public class NotificationService{
             self.ExecuteNewMessageDelegate()
             }, errorCallback: { (error) -> Void in
                 //do nothing
-                println(error)
+                print(error)
             }, prepareCallback: nil)
     }
     
@@ -205,7 +214,11 @@ public class NotificationService{
         
         var error : NSError?
         
-        HttpClient.Put(url as String, body: "{ \"reply\": \(answerIndex) }", err: &error)
+        do {
+            try HttpClient.Put(url as String, body: "{ \"reply\": \(answerIndex) }")
+        } catch var error1 as NSError {
+            error = error1
+        }
     }
     
     //回覆問卷
@@ -215,6 +228,10 @@ public class NotificationService{
         
         var error : NSError?
         
-        HttpClient.Put(url as String, body: "{ \"reply\": \(answers.description) }", err: &error)
+        do {
+            try HttpClient.Put(url as String, body: "{ \"reply\": \(answers.description) }")
+        } catch var error1 as NSError {
+            error = error1
+        }
     }
 }
