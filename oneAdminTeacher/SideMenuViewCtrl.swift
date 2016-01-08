@@ -72,6 +72,14 @@ class SideMenuViewCtrl: UIViewController{
 //        ChangeContentView(nextView)
     }
     
+    @IBAction func gotoAlbums(sender: AnyObject) {
+        
+        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("Albums")
+        
+        ChangeContentView(nextView!)
+    }
+    
+    
     func Logout(){
         
         Global.Reset()

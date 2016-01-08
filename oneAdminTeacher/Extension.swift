@@ -18,6 +18,36 @@ import Foundation
 //    }
 //}
 
+//回傳一張縮放後的圖片
+extension UIImage{
+    func GetResizeImage(scale:CGFloat) -> UIImage{
+        
+        let width = self.size.width
+        let height = self.size.height
+        
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(width * scale, height * scale), false, 1)
+        self.drawInRect(CGRectMake(0, 0, width * scale, height * scale))
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return newImage
+    }
+    
+    func GetResizeImage(width:CGFloat, height:CGFloat) -> UIImage{
+        
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(width, height), false, 1)
+        self.drawInRect(CGRectMake(0, 0, width, height))
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return newImage
+    }
+}
+
 extension Connection{
     func SendRequest(targetService:String,bodyContent:String,inout _ error: DSFault!) -> String {
         
@@ -25,13 +55,17 @@ extension Connection{
         
         var rsp = self.sendRequest(targetService, bodyContent: bodyContent, &e)
         
-        if e != nil{
-            RenewRefreshToken(Global.RefreshToken)
-            self.connect(self.accessPoint, self.targetContract, SecurityToken.createOAuthToken(Global.AccessToken), &error)
-            rsp = self.sendRequest(targetService, bodyContent: bodyContent, &e)
+        dispatch_sync(Global.LockQueue) {
+            
+            if e != nil{
+                RenewRefreshToken(Global.RefreshToken)
+                self.connect(self.accessPoint, self.targetContract, SecurityToken.createOAuthToken(Global.AccessToken), &error)
+                rsp = self.sendRequest(targetService, bodyContent: bodyContent, &e)
+            }
+            
+            error = e
+            
         }
-        
-        error = e
         
         return rsp == nil ? "" : rsp
     }

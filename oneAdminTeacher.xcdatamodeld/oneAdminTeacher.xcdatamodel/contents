@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14D131" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Xcode 4.3">
     <entity name="Message" syncable="YES">
         <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
@@ -14,6 +14,14 @@
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="voted" optional="YES" attributeType="Boolean" syncable="YES"/>
     </entity>
+    <entity name="Photo" syncable="YES">
+        <attribute name="detail_img" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="detail_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dsns" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="preview_img" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="preview_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Student" representedClassName="" syncable="YES">
         <attribute name="dsns" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
@@ -22,5 +30,6 @@
     <elements>
         <element name="Message" positionX="-54" positionY="18" width="128" height="225"/>
         <element name="Student" positionX="-54" positionY="-9" width="128" height="90"/>
+        <element name="Photo" positionX="-54" positionY="99" width="128" height="135"/>
     </elements>
 </model>

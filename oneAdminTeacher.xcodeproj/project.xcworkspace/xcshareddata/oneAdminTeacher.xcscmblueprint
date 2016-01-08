@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "3C82A24FF4F33DE0BE6D242114547AE556C1C1B0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "3C82A24FF4F33DE0BE6D242114547AE556C1C1B0" : 0,
+    "1C6B64E11A3190BCA1963042963B26B82B3DB831" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "7068D0DE-9301-4068-8AF9-B7CD0ADA8FBF",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "3C82A24FF4F33DE0BE6D242114547AE556C1C1B0" : "oneAdminTeacher",
+    "1C6B64E11A3190BCA1963042963B26B82B3DB831" : "oneCampusAdmin\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "oneAdminTeacher",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "oneAdminTeacher.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/imcloudwu\/oneCampusAdmin.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "1C6B64E11A3190BCA1963042963B26B82B3DB831"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/imcloudwu\/oneAdminTeacher.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "3C82A24FF4F33DE0BE6D242114547AE556C1C1B0"
+    }
+  ]
+}

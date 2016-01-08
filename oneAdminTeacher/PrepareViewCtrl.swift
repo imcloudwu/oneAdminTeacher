@@ -7,13 +7,52 @@ import UIKit
 
 class PrepareViewCtrl: UIViewController {
     
-    @IBOutlet weak var statusLabel: UILabel!
     @IBOutlet weak var CancelBtn: UIButton!
+    @IBOutlet weak var loadingLabel: UILabel!
+    
+    @IBOutlet weak var kycp: KYCircularProgress!
     
     var code : String!
     var refreshToken : String!
     
     var Success = false
+    
+    var Timer : NSTimer?
+    
+    func StartProgress(){
+        Timer?.invalidate()
+        Timer = NSTimer.scheduledTimerWithTimeInterval(0.33, target: self, selector: "timerCallback", userInfo: nil, repeats: true)
+        kycp.progress = 0.0
+    }
+    
+    func StopProgress(){
+        kycp.progress = 1.0
+        Timer?.invalidate()
+        Timer = nil
+    }
+    
+    func timerCallback() {
+        
+        if kycp.progress >= 0.95{
+            kycp.progress = 0.95
+        }
+        else{
+            kycp.progress += 0.05
+        }
+        
+        switch loadingLabel.text!{
+            
+        case "Loading...":
+            loadingLabel.text = "Loading."
+            break
+        case "Loading..":
+            loadingLabel.text = "Loading..."
+            break
+        default:
+            loadingLabel.text = "Loading.."
+            break
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,12 +61,21 @@ class PrepareViewCtrl: UIViewController {
         CancelBtn.layer.cornerRadius = 5
         CancelBtn.layer.masksToBounds = true
         
+        kycp.showProgressGuide = true
+        kycp.lineWidth = 15.0
+        
+        kycp.progressGuideColor = UIColor(red: 33.0/255, green: 150.0/255, blue: 243.0/255, alpha: 0.1)
+        kycp.colors = [UIColor(red: 33.0/255, green: 150.0/255, blue: 243.0/255, alpha: 0.8)]
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func viewDidAppear(animated: Bool) {
         
-        self.statusLabel.text = "取得AccessToken..."
+        // create KYCircularProgress
+        StartProgress()
+        
+        //self.statusLabel.text = "取得AccessToken..."
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
@@ -46,7 +94,7 @@ class PrepareViewCtrl: UIViewController {
                     self.GetMyPhotoFromLocal()
                 }
                 
-                self.statusLabel.text = "取得DSNS清單..."
+                //self.statusLabel.text = "取得DSNS清單..."
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                     
@@ -55,19 +103,24 @@ class PrepareViewCtrl: UIViewController {
                     dispatch_async(dispatch_get_main_queue(), {
                         
                         if self.Success{
-                            self.statusLabel.text = "註冊裝置..."
+                            //self.statusLabel.text = "註冊裝置..."
                             
                             NotificationService.Register(Global.MyDeviceToken, accessToken: Global.AccessToken) { () -> () in
                                 
+                                self.StopProgress()
+                                
                                 EnableSideMenu()
                                 
+                                //let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery") as! UIViewController
                                 let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("ClassQuery")
                                 ChangeContentView(nextView!)
                             }
                             
                         }
                         else{
-                            self.statusLabel.text = "登錄過程發生失敗..."
+                            //self.statusLabel.text = "登錄過程發生失敗..."
+                            
+                            self.StopProgress()
                             
                             UIView.animateWithDuration(1, animations: { () -> Void in
                                 self.CancelBtn.hidden = false
@@ -101,35 +154,37 @@ class PrepareViewCtrl: UIViewController {
         
         let con = Connection()
         
-        if con.connect("https://auth.ischool.com.tw:8443/dsa/greening", "user", SecurityToken.createOAuthToken(Global.AccessToken), &dserr){
-            let rsp = con.sendRequest("GetApplicationListRef", bodyContent: "<Request><Type>dynpkg</Type></Request>", &dserr)
-            
-            let xml: AEXMLDocument?
-            do {
-                xml = try AEXMLDocument(xmlData: rsp.dataValue)
-            } catch _ {
-                xml = nil
-            }
-            //println(xml?.xmlString)
-            
-            if let apps = xml?.root["Response"]["User"]["App"].all {
-                for app in apps{
-                    let title = app.attributes["Title"]
-                    let accessPoint = app.attributes["AccessPoint"]
-                    let dsns = DsnsItem(name: title!, accessPoint: accessPoint!)
-                    if !dsnsList.contains(dsns){
-                        dsnsList.append(dsns)
+        if let at = Global.AccessToken{
+            if con.connect("https://auth.ischool.com.tw:8443/dsa/greening", "user", SecurityToken.createOAuthToken(at), &dserr){
+                let rsp = con.sendRequest("GetApplicationListRef", bodyContent: "<Request><Type>dynpkg</Type></Request>", &dserr)
+                
+                let xml: AEXMLDocument?
+                do {
+                    xml = try AEXMLDocument(xmlData: rsp.dataValue)
+                } catch _ {
+                    xml = nil
+                }
+                //println(xml?.xmlString)
+                
+                if let apps = xml?.root["Response"]["User"]["App"].all {
+                    for app in apps{
+                        let title = app.attributes["Title"]
+                        let accessPoint = app.attributes["AccessPoint"]
+                        let dsns = DsnsItem(name: title!, accessPoint: accessPoint!)
+                        if !dsnsList.contains(dsns){
+                            dsnsList.append(dsns)
+                        }
                     }
                 }
-            }
-            
-            if let apps = xml?.root["Response"]["Domain"]["App"].all {
-                for app in apps{
-                    let title = app.attributes["Title"]
-                    let accessPoint = app.attributes["AccessPoint"]
-                    let dsns = DsnsItem(name: title!, accessPoint: accessPoint!)
-                    if !dsnsList.contains(dsns){
-                        dsnsList.append(dsns)
+                
+                if let apps = xml?.root["Response"]["Domain"]["App"].all {
+                    for app in apps{
+                        let title = app.attributes["Title"]
+                        let accessPoint = app.attributes["AccessPoint"]
+                        let dsns = DsnsItem(name: title!, accessPoint: accessPoint!)
+                        if !dsnsList.contains(dsns){
+                            dsnsList.append(dsns)
+                        }
                     }
                 }
             }
@@ -137,6 +192,7 @@ class PrepareViewCtrl: UIViewController {
         
         Global.DsnsList = dsnsList
         
+        GetMyGroups()
     }
     
     func GetMyAccountInfo(){
@@ -169,6 +225,67 @@ class PrepareViewCtrl: UIViewController {
             Global.MyPhoto = UIImage(named: "default photo.jpg")
         }
     }
+    
+    func GetMyGroups(){
+        
+        var tmp = [GroupItem]()
+        
+        for dsns in Global.DsnsList{
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+                
+                tmp += self.GetGroupData(dsns.AccessPoint)
+                
+                dispatch_async(dispatch_get_main_queue(), {
+                    
+                    Global.MyGroups = tmp
+                })
+            })
+        }
+    }
+    
+    func GetGroupData(dsns:String) -> [GroupItem] {
+        
+        var retVal = [GroupItem]()
+        
+        let rsp = try? HttpClient.Get("http://dsns.1campus.net/\(dsns)/sakura/GetMyGroup?stt=PassportAccessToken&AccessToken=\(Global.AccessToken)")
+        
+        if rsp == nil{
+            return retVal
+        }
+        
+        //var nserr : NSError?
+        var xml: AEXMLDocument?
+        do {
+            xml = try AEXMLDocument(xmlData: rsp!)
+        } catch _ {
+            xml = nil
+            return retVal
+        }
+        
+        if let groups = xml?.root["Group"].all{
+            
+            for group in groups{
+                
+                let groupId = group["GroupId"].stringValue
+                let groupName = group["GroupName"].stringValue
+                let isTeacher = group["IsTeacher"].stringValue == "true" ? true : false
+                let isParent = group["IsParent"].stringValue == "true" ? true : false
+                let isStudent = group["IsStudent"].stringValue == "true" ? true : false
+                
+                let gi = GroupItem(DSNS: dsns, GroupId: groupId, GroupName: groupName, IsTeacher: isTeacher)
+                
+                //if !isStudent{
+                retVal.append(gi)
+                //}
+                
+            }
+        }
+        
+        return retVal
+    }
+
+
 }
 
 class DsnsItem : Equatable{

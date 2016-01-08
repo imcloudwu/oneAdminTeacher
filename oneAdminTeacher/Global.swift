@@ -9,7 +9,12 @@
 import Foundation
 import UIKit
 
+var PhotoCoreData = PhotoCoreDataClass()
+
 public class Global{
+    
+    static var MyToast = Toast()
+    
     static var clientID = "9403ec217a19a849d498a5c18909bf38"
     static var clientSecret = "40654f9b8d2ddbf54d8f3059c2d70cd80d4e7e0fa3094d5b19305f945a38f025"
     static var ContractName = "1campus.mobile.teacher"
@@ -17,6 +22,7 @@ public class Global{
     static var MyPhoto : UIImage!
     static var MyName : String!
     static var MyEmail : String!
+    static var MyGroups = [GroupItem]()
     static var MyDeviceToken : String!
     static var AccessToken : String!
     static var RefreshToken : String!
@@ -36,7 +42,25 @@ public class Global{
     
     static var LockQueue = dispatch_queue_create("LockQueue", nil)
     
+    static var ScreenSize: CGRect = UIScreen.mainScreen().bounds
+    
+    static var TeacherGroups: [GroupItem]{
+        
+        var retVal = [GroupItem]()
+        
+        for group in MyGroups{
+            if group.IsTeacher{
+                retVal.append(group)
+            }
+        }
+        
+        return retVal
+    }
+    
     static func Reset(){
+        
+        MyGroups = [GroupItem]()
+        
         MyPhoto = nil
         ClassList = nil
         MySchoolList = [DsnsItem]()
@@ -319,10 +343,15 @@ func RenewRefreshToken(refreshToken:String){
 //new solution
 func GetSchoolName(con:Connection) -> String{
     
+    for s in Global.MySchoolList{
+        if s.AccessPoint == con.accessPoint{
+            return s.Name
+        }
+    }
+    
     var schoolName = con.accessPoint
     
     var error : DSFault!
-    var nserr : NSError?
     
     let rsp = con.SendRequest("main.GetSchoolName", bodyContent: "", &error)
     
@@ -342,26 +371,6 @@ func GetSchoolName(con:Connection) -> String{
             Global.MySchoolList.append(di)
         }
     }
-    
-    
-    //        //encode成功呼叫查詢
-    //        if let encodingName = con.accessPoint.UrlEncoding{
-    //
-    //            var data = HttpClient.Get("http://dsns.1campus.net/campusman.ischool.com.tw/config.public/GetSchoolList?content=%3CRequest%3E%3CMatch%3E\(encodingName)%3C/Match%3E%3CPagination%3E%3CPageSize%3E10%3C/PageSize%3E%3CStartPage%3E1%3C/StartPage%3E%3C/Pagination%3E%3C/Request%3E")
-    //
-    //            if let rsp = data{
-    //
-    //                //println(NSString(data: rsp, encoding: NSUTF8StringEncoding))
-    //
-    //                var nserr : NSError?
-    //
-    //                let xml = AEXMLDocument(xmlData: rsp, error: &nserr)
-    //
-    //                if let name = xml?.root["Response"]["School"]["Title"].stringValue{
-    //                    schoolName = name
-    //                }
-    //            }
-    //        }
     
     return schoolName
 }
@@ -449,6 +458,15 @@ func RegisterForKeyboardNotifications(vc:UIViewController) {
         selector: "keyboardWillBeShown:",
         name: UIKeyboardWillShowNotification,
         object: nil)
+}
+
+func GetBase64FromImage(img:UIImage,compressionQuality: CGFloat) -> String{
+    
+    if let imageData = UIImageJPEGRepresentation(img, compressionQuality){
+        return imageData.base64EncodedStringWithOptions([])
+    }
+    
+    return ""
 }
 
 
