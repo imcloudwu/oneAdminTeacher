@@ -8,7 +8,7 @@
 import UIKit
 import Parse
 
-class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegate {
+class MessageViewCtrl: ToggleView,UITableViewDataSource,UITableViewDelegate {
     
     var messageData = [MessageItem]()
     var DisplayMessage = [MessageItem]()
@@ -41,9 +41,6 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
         super.viewDidLoad()
         
         self.ResetBadge()
-        
-        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
-        self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "Menu 2-26.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "MessageMenu")
         
@@ -211,12 +208,6 @@ class MessageViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegat
         }
         
         return retVal
-    }
-    
-    func ToggleSideMenu(){
-        let app = UIApplication.sharedApplication().delegate as! AppDelegate
-        
-        app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
     }
     
     func MessageMenu(){

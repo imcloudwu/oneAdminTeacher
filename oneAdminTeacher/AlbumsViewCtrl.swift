@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AlbumsViewCtrl: UIViewController,UITableViewDataSource,UITableViewDelegate {
+class AlbumsViewCtrl: ToggleView, UITableViewDataSource,UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     

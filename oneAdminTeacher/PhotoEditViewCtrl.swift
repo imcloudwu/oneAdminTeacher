@@ -104,7 +104,11 @@ class PhotoEditViewCtrl: UIViewController,UIImagePickerControllerDelegate,ELCIma
         
         if let base = Base{
             
-            if let img = PhotoCoreData.LoadDetailData(base){
+//            if let img = PhotoCoreData.LoadDetailData(base){
+//                _selectedImg = [img]
+//            }
+            
+            if let img = base.GetDeatilImage(){
                 _selectedImg = [img]
             }
             

@@ -17,6 +17,8 @@ class PhotoPreviewCtrl: UIViewController,UICollectionViewDelegateFlowLayout,UICo
     var PreviewDatas = [PreviewData]()
     var PassValues = [PreviewData]()
     
+    var NeedReload = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -29,6 +31,24 @@ class PhotoPreviewCtrl: UIViewController,UICollectionViewDelegateFlowLayout,UICo
     }
     
     override func viewDidAppear(animated: Bool) {
+        
+        if self.PreviewDatas.count == 0{
+            NeedReload = true
+        }
+        
+        if NeedReload{
+            NeedReload = false
+            Reload()
+        }
+        
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    func Reload(){
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
@@ -47,12 +67,9 @@ class PhotoPreviewCtrl: UIViewController,UICollectionViewDelegateFlowLayout,UICo
         
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     func AddPhoto(){
+        
+        NeedReload = true
         
         let editView = self.storyboard?.instantiateViewControllerWithIdentifier("PhotoEditViewCtrl") as! PhotoEditViewCtrl
         
@@ -78,28 +95,28 @@ class PhotoPreviewCtrl: UIViewController,UICollectionViewDelegateFlowLayout,UICo
         
         if data.Photo == nil {
             
-            if let `catch` = PhotoCoreData.LoadPreviewData(data) {
-                data.Photo = `catch`
-            }
-            else{
-                
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
-                    
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            
+//                if let `catch` = PhotoCoreData.LoadPreviewData(data) {
+//                    data.Photo = `catch`
+//                }
+//                else{
                     data.UpdatePreviewData()
+//                    //PhotoCoreData.SaveCatchData(data)
+//                }
+                
+                dispatch_async(dispatch_get_main_queue(), {
                     
-                    dispatch_async(dispatch_get_main_queue(), {
+                    if let tempCell = collectionView.cellForItemAtIndexPath(indexPath){
                         
-                        PhotoCoreData.SaveCatchData(data)
+                        let tempImgView = tempCell.viewWithTag(100) as! UIImageView
                         
-                        if let tempCell = collectionView.cellForItemAtIndexPath(indexPath){
-                            
-                            let tempImgView = tempCell.viewWithTag(100) as! UIImageView
-                            
-                            tempImgView.image = data.Photo
-                        }
-                    })
+                        tempImgView.image = data.Photo
+                    }
+                    
                 })
-            }
+                
+            })
         }
         
         imgView.image = data.Photo
@@ -215,6 +232,18 @@ class PreviewData{
         }
         
         return false
+    }
+    
+    func GetDeatilImage() -> UIImage? {
+        
+        if let nsd = try? HttpClient.Get(DetailUrl){
+            if let img = UIImage(data: nsd){
+                
+                return img
+            }
+        }
+        
+        return nil
     }
 }
 

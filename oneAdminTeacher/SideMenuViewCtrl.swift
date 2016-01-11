@@ -90,6 +90,8 @@ class SideMenuViewCtrl: UIViewController{
         
         MessageCoreData.DeleteAll()
         
+        NSURLCache.sharedURLCache().removeAllCachedResponses()
+        
         var storage : NSHTTPCookieStorage = NSHTTPCookieStorage.sharedHTTPCookieStorage()
         for cookie in storage.cookies!
         {

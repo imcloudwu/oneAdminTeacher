@@ -15,6 +15,23 @@ import Foundation
 //    var ColorAlarm : Bool
 //}
 
+class ToggleView : UIViewController{
+    
+    override func viewDidLoad(){
+        
+        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
+        
+        self.navigationItem.leftBarButtonItem = sideMenuBtn
+    }
+    
+    func ToggleSideMenu(){
+        
+        let app = UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
+    }
+}
+
 //Mark : My Toast Class
 class Toast {
     

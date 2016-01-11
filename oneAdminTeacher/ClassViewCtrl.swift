@@ -9,7 +9,7 @@
 
 import UIKit
 
-class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
+class ClassViewCtrl: ToggleView,UITableViewDelegate,UITableViewDataSource{
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var progress: UIProgressView!
@@ -32,9 +32,6 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         self.refreshControl.attributedTitle = NSAttributedString(string: "")
         self.refreshControl.addTarget(self, action: "ReloadData", forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
-        
-        let sideMenuBtn = UIBarButtonItem(image: UIImage(named: "Menu-24.png"), style: UIBarButtonItemStyle.Plain, target: self, action: "ToggleSideMenu")
-        self.navigationItem.leftBarButtonItem = sideMenuBtn
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -61,12 +58,6 @@ class ClassViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataSource{
         if _ClassList.count == 0 {
             GetMyClassList()
         }
-    }
-    
-    func ToggleSideMenu(){
-        let app = UIApplication.sharedApplication().delegate as! AppDelegate
-        
-        app.centerContainer?.toggleDrawerSide(MMDrawerSide.Left, animated: true, completion: nil)
     }
     
     func ReloadData(){

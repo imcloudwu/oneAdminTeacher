@@ -48,26 +48,40 @@ class PhotoPageViewCtrl: UIViewController,UIScrollViewDelegate
         
         self.SetTextView(Base.Comment)
         
-        if let detail = PhotoCoreData.LoadDetailData(Base){
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
             
-            self.imgView.image = detail
-        }
-        else{
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+            if let img = self.GetDetailImage(){
                 
-                if let img = self.GetDetailImage(){
+                dispatch_async(dispatch_get_main_queue(), {
                     
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        self.imgView.image = img
-                        
-                        PhotoCoreData.UpdateCatchData(self.Base, detail: img)
-                    })
+                    self.imgView.image = img
                     
-                }
-            })
-        }
+                    //PhotoCoreData.UpdateCatchData(self.Base, detail: img)
+                })
+                
+            }
+        })
+        
+//        if let detail = PhotoCoreData.LoadDetailData(Base){
+//            
+//            self.imgView.image = detail
+//        }
+//        else{
+//            
+//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
+//                
+//                if let img = self.GetDetailImage(){
+//                    
+//                    dispatch_async(dispatch_get_main_queue(), {
+//                        
+//                        self.imgView.image = img
+//                        
+//                        //PhotoCoreData.UpdateCatchData(self.Base, detail: img)
+//                    })
+//                    
+//                }
+//            })
+//        }
     }
     
     override func didReceiveMemoryWarning()
