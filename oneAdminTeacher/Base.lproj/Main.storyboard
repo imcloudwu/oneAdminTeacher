@@ -351,7 +351,7 @@
                                     </mask>
                                 </variation>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Stack of Photos Filled-32.png" translatesAutoresizingMaskIntoConstraints="NO" id="Rpb-82-IrH">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Support Filled-32.png" translatesAutoresizingMaskIntoConstraints="NO" id="Rpb-82-IrH">
                                 <rect key="frame" x="16" y="334" width="32" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="32" id="WU4-ri-0Em"/>
@@ -398,7 +398,7 @@
                                     <constraint firstAttribute="height" constant="32" id="G0a-QU-fGc"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                <state key="normal" title="校   園   相   簿">
+                                <state key="normal" title="意   見   反   應">
                                     <color key="titleColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
                                 <variation key="default">
@@ -414,7 +414,7 @@
                                     </mask>
                                 </variation>
                                 <connections>
-                                    <action selector="gotoAlbums:" destination="AOO-ej-9Lg" eventType="touchUpInside" id="lVX-xw-TqY"/>
+                                    <action selector="SendMailToSupportTeam:" destination="AOO-ej-9Lg" eventType="touchUpInside" id="9yO-Bl-pJK"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hqe-NV-mgp">
@@ -562,6 +562,97 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ggx-8t-Qh0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-898" y="1948"/>
+        </scene>
+        <!--As Teacher View Ctrl-->
+        <scene sceneID="Pwe-vL-0lV">
+            <objects>
+                <viewController storyboardIdentifier="AsTeacherViewCtrl" id="1d2-km-isD" customClass="AsTeacherViewCtrl" customModule="oneAdminTeacher" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="hbS-79-zlT"/>
+                        <viewControllerLayoutGuide type="bottom" id="YBH-5b-91b"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="gk0-M8-bW9">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NTj-XO-3OK">
+                                <rect key="frame" x="20" y="59" width="560" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="F6n-ZZ-pII"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="選擇學校"/>
+                                <connections>
+                                    <action selector="selectSchoolBtnClick:" destination="1d2-km-isD" eventType="touchUpInside" id="ea1-mh-dIM"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="請先選擇您的學校" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hqy-Bg-4Bq">
+                                <rect key="frame" x="20" y="28" width="560" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="HAU-bD-whh"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="輸入您的教師代碼" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Sj-OF-PAT">
+                                <rect key="frame" x="20" y="99" width="560" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="vsg-Zl-pEt"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="llG-vW-ERo">
+                                <rect key="frame" x="20" y="130" width="560" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="8U9-zh-Ane"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DtV-Pb-ESZ">
+                                <rect key="frame" x="0.0" y="560" width="600" height="40"/>
+                                <color key="backgroundColor" red="1" green="0.22998733800000001" blue="0.36862745099999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="eLI-HN-kAb"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="確          認"/>
+                                <connections>
+                                    <action selector="Submit:" destination="1d2-km-isD" eventType="touchUpInside" id="ztc-fN-8UH"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="9Sj-OF-PAT" firstAttribute="leading" secondItem="gk0-M8-bW9" secondAttribute="leading" constant="20" id="BPD-Ad-rWL"/>
+                            <constraint firstAttribute="trailing" secondItem="llG-vW-ERo" secondAttribute="trailing" constant="20" id="Eyn-v8-ksL"/>
+                            <constraint firstItem="DtV-Pb-ESZ" firstAttribute="leading" secondItem="gk0-M8-bW9" secondAttribute="leading" id="Hbj-7Z-I2m"/>
+                            <constraint firstItem="hqy-Bg-4Bq" firstAttribute="leading" secondItem="gk0-M8-bW9" secondAttribute="leading" constant="20" id="Pf7-Wa-Cru"/>
+                            <constraint firstAttribute="trailing" secondItem="NTj-XO-3OK" secondAttribute="trailing" constant="20" id="R72-Cq-1BU"/>
+                            <constraint firstItem="NTj-XO-3OK" firstAttribute="top" secondItem="hqy-Bg-4Bq" secondAttribute="bottom" constant="10" id="Sf4-Ly-fqO"/>
+                            <constraint firstAttribute="trailing" secondItem="hqy-Bg-4Bq" secondAttribute="trailing" constant="20" id="VaT-Hm-MB0"/>
+                            <constraint firstItem="hqy-Bg-4Bq" firstAttribute="top" secondItem="hbS-79-zlT" secondAttribute="bottom" constant="8" id="asX-wD-yQM"/>
+                            <constraint firstItem="YBH-5b-91b" firstAttribute="top" secondItem="DtV-Pb-ESZ" secondAttribute="bottom" id="cGz-il-dFo"/>
+                            <constraint firstItem="NTj-XO-3OK" firstAttribute="leading" secondItem="gk0-M8-bW9" secondAttribute="leading" constant="20" id="dJt-b4-Agk"/>
+                            <constraint firstAttribute="trailing" secondItem="9Sj-OF-PAT" secondAttribute="trailing" constant="20" id="gd4-DH-2m6"/>
+                            <constraint firstItem="llG-vW-ERo" firstAttribute="leading" secondItem="gk0-M8-bW9" secondAttribute="leading" constant="20" id="hq1-US-Hbb"/>
+                            <constraint firstItem="9Sj-OF-PAT" firstAttribute="top" secondItem="NTj-XO-3OK" secondAttribute="bottom" constant="10" id="lDV-Uu-3DV"/>
+                            <constraint firstAttribute="trailing" secondItem="DtV-Pb-ESZ" secondAttribute="trailing" id="nVg-jY-PNo"/>
+                            <constraint firstItem="llG-vW-ERo" firstAttribute="top" secondItem="9Sj-OF-PAT" secondAttribute="bottom" constant="10" id="wld-wk-lbN"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="codeTextField" destination="llG-vW-ERo" id="5R2-sx-3ZP"/>
+                        <outlet property="selectSchoolBtn" destination="NTj-XO-3OK" id="zGQ-Vs-czW"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4fi-jh-glN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-379" y="2099"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="MeP-O0-eIz">
@@ -1040,10 +1131,25 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tck-6a-TSZ">
+                                <rect key="frame" x="520" y="520" width="60" height="60"/>
+                                <color key="backgroundColor" red="0.93725490199999995" green="0.60392156860000001" blue="0.60392156860000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="GcR-tp-Aun"/>
+                                    <constraint firstAttribute="width" constant="60" id="Ijg-cF-sJe"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" image="Plus Math-100.png"/>
+                                <connections>
+                                    <action selector="addClassBtnClick:" destination="6Fk-qh-sNK" eventType="touchUpInside" id="v2W-la-n2Z"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="x0L-Xx-2y1" firstAttribute="leading" secondItem="rKH-Ad-5Te" secondAttribute="leadingMargin" constant="-20" id="0mw-DR-fRl"/>
+                            <constraint firstItem="UaH-Nf-WO5" firstAttribute="top" secondItem="tck-6a-TSZ" secondAttribute="bottom" constant="20" id="8WQ-gB-mKE"/>
+                            <constraint firstAttribute="trailing" secondItem="tck-6a-TSZ" secondAttribute="trailing" constant="20" id="AJU-sb-Vfh"/>
                             <constraint firstItem="x0L-Xx-2y1" firstAttribute="top" secondItem="W9x-me-wNp" secondAttribute="bottom" id="OhR-O7-Vd4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="x0L-Xx-2y1" secondAttribute="trailing" constant="-20" id="b2W-cB-bRA"/>
                             <constraint firstItem="UaH-Nf-WO5" firstAttribute="top" secondItem="x0L-Xx-2y1" secondAttribute="bottom" id="nbh-sd-zOB"/>
@@ -1051,6 +1157,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="hQc-cJ-jzO"/>
                     <connections>
+                        <outlet property="addClassBtn" destination="tck-6a-TSZ" id="SCU-yp-Nsn"/>
                         <outlet property="noDataLabel" destination="gUa-wh-zNT" id="1LX-5S-eUq"/>
                         <outlet property="progress" destination="rCL-2U-REe" id="98f-ci-baE"/>
                         <outlet property="tableView" destination="x0L-Xx-2y1" id="BRC-fD-cAw"/>
@@ -3903,6 +4010,74 @@
             </objects>
             <point key="canvasLocation" x="4317" y="6085"/>
         </scene>
+        <!--Select School View Ctrl-->
+        <scene sceneID="cIW-nN-w8a">
+            <objects>
+                <viewController storyboardIdentifier="SelectSchoolViewCtrl" id="2Iw-Kw-Pr5" customClass="SelectSchoolViewCtrl" customModule="oneAdminTeacher" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="IVJ-nG-0K0"/>
+                        <viewControllerLayoutGuide type="bottom" id="22R-aR-I8d"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="zIs-Dw-T8j">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="aso-au-9HQ">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="511"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FMl-G9-49Q">
+                                <rect key="frame" x="0.0" y="560" width="600" height="40"/>
+                                <color key="backgroundColor" red="1" green="0.22998733800000001" blue="0.36862745099999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="Bvw-QQ-hVx"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="按  學  制  查  詢"/>
+                                <connections>
+                                    <action selector="typeBtnClick:" destination="2Iw-Kw-Pr5" eventType="touchUpInside" id="O5u-eX-Htl"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Sx-Tb-m8p">
+                                <rect key="frame" x="0.0" y="519" width="600" height="40"/>
+                                <color key="backgroundColor" red="1" green="0.22998733800000001" blue="0.36862745099999999" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="f2M-Js-Iyg"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="按  地  區  查  詢"/>
+                                <connections>
+                                    <action selector="locationBtnClick:" destination="2Iw-Kw-Pr5" eventType="touchUpInside" id="bB8-Td-cmM"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="22R-aR-I8d" firstAttribute="top" secondItem="FMl-G9-49Q" secondAttribute="bottom" id="51k-wR-bLo"/>
+                            <constraint firstItem="aso-au-9HQ" firstAttribute="top" secondItem="zIs-Dw-T8j" secondAttribute="top" id="9HD-2S-ygT"/>
+                            <constraint firstItem="FMl-G9-49Q" firstAttribute="leading" secondItem="zIs-Dw-T8j" secondAttribute="leading" id="B43-Fm-Fae"/>
+                            <constraint firstAttribute="trailing" secondItem="2Sx-Tb-m8p" secondAttribute="trailing" id="KUc-xg-W6Z"/>
+                            <constraint firstItem="aso-au-9HQ" firstAttribute="leading" secondItem="zIs-Dw-T8j" secondAttribute="leading" id="QHr-8m-kbQ"/>
+                            <constraint firstAttribute="trailing" secondItem="FMl-G9-49Q" secondAttribute="trailing" id="bhZ-WI-FuD"/>
+                            <constraint firstItem="FMl-G9-49Q" firstAttribute="top" secondItem="2Sx-Tb-m8p" secondAttribute="bottom" constant="1" id="cSd-By-gEK"/>
+                            <constraint firstItem="2Sx-Tb-m8p" firstAttribute="leading" secondItem="zIs-Dw-T8j" secondAttribute="leading" id="jHd-6P-dbK"/>
+                            <constraint firstItem="2Sx-Tb-m8p" firstAttribute="top" secondItem="aso-au-9HQ" secondAttribute="bottom" constant="8" id="k2P-gJ-8hT"/>
+                            <constraint firstAttribute="trailing" secondItem="aso-au-9HQ" secondAttribute="trailing" id="npS-Wx-u0n"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Y36-Rn-TXt"/>
+                    <connections>
+                        <outlet property="locationBtn" destination="2Sx-Tb-m8p" id="4mm-7M-qgl"/>
+                        <outlet property="tableView" destination="aso-au-9HQ" id="sLC-fI-wcK"/>
+                        <outlet property="typeBtn" destination="FMl-G9-49Q" id="Cpi-Rb-BKE"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ytb-St-djB" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="264" y="2099"/>
+        </scene>
     </scenes>
     <resources>
         <image name="Checked-32.png" width="32" height="32"/>
@@ -3913,10 +4088,11 @@
         <image name="Message Filled-32.png" width="32" height="32"/>
         <image name="Message Filled-50.png" width="50" height="50"/>
         <image name="Paper Filled-50.png" width="50" height="50"/>
+        <image name="Plus Math-100.png" width="100" height="100"/>
         <image name="SLR Camera Filled-100.png" width="100" height="100"/>
         <image name="Search Property Filled-32.png" width="32" height="32"/>
-        <image name="Stack of Photos Filled-32.png" width="32" height="32"/>
         <image name="Star Filled-50.png" width="50" height="50"/>
+        <image name="Support Filled-32.png" width="32" height="32"/>
         <image name="User-100.png" width="100" height="100"/>
         <image name="default photo.jpg" width="120" height="120"/>
         <image name="sidebackground.jpg" width="1280" height="853"/>

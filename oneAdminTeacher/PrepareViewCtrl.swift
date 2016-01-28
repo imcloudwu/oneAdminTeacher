@@ -228,17 +228,15 @@ class PrepareViewCtrl: UIViewController {
     
     func GetMyGroups(){
         
-        var tmp = [GroupItem]()
-        
         for dsns in Global.DsnsList{
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), {
                 
-                tmp += self.GetGroupData(dsns.AccessPoint)
+                let tmp = self.GetGroupData(dsns.AccessPoint)
                 
                 dispatch_async(dispatch_get_main_queue(), {
                     
-                    Global.MyGroups = tmp
+                    Global.MyGroups += tmp
                 })
             })
         }
@@ -292,10 +290,14 @@ class DsnsItem : Equatable{
     
     var Name : String
     var AccessPoint : String
+    var Location : String
+    var Type : String
     
     init(name:String,accessPoint:String){
         self.Name = name
         self.AccessPoint = accessPoint
+        self.Location = ""
+        self.Type = ""
     }
 }
 

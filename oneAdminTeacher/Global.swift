@@ -28,9 +28,9 @@ public class Global{
     static var RefreshToken : String!
     static var DsnsList : [DsnsItem]!
     static var CurrentDsns : DsnsItem!
-    static var Students = [Student]()
-    static var CurrentStudent : Student!
-    static var CountProgressTime = [ProgressTimer]()
+    //static var Students = [Student]()
+    //static var CurrentStudent : Student!
+    //static var CountProgressTime = [ProgressTimer]()
     static var ClassList : [ClassItem]!
     static var Alert : UIAlertController!
     
@@ -60,6 +60,7 @@ public class Global{
     static func Reset(){
         
         MyGroups = [GroupItem]()
+        DsnsList = [DsnsItem]()
         
         MyPhoto = nil
         ClassList = nil
@@ -98,21 +99,21 @@ public class Global{
     //        return nil
     //    }
     
-    static func DeleteStudent(student:Student){
-        var newData = [Student]()
-        
-        for stu in Students{
-            if stu != student{
-                newData.append(stu)
-            }
-        }
-        
-        if CurrentStudent != nil && CurrentStudent == student{
-            CurrentStudent = nil
-        }
-        
-        Students = newData
-    }
+//    static func DeleteStudent(student:Student){
+//        var newData = [Student]()
+//        
+//        for stu in Students{
+//            if stu != student{
+//                newData.append(stu)
+//            }
+//        }
+//        
+//        if CurrentStudent != nil && CurrentStudent == student{
+//            CurrentStudent = nil
+//        }
+//        
+//        Students = newData
+//    }
     
     static func SetAccessTokenAndRefreshToken(token:(accessToken:String,refreshToken:String)!){
         

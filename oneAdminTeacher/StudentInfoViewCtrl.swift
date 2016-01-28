@@ -52,10 +52,6 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         // Do any additional setup after loading the view, typically from a nib.
     }
     
-    override func viewWillAppear(animated: Bool) {
-        LockBtnEnableCheck()
-    }
-    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -88,16 +84,16 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         }
     }
     
-    func AddToList(){
-        Global.Students.append(StudentData)
-        LockBtnEnableCheck()
-        
-        //存入catch
-        StudentCoreData.SaveCatchData(StudentData)
-    }
+//    func AddToList(){
+//        Global.Students.append(StudentData)
+//        LockBtnEnableCheck()
+//        
+//        //存入catch
+//        StudentCoreData.SaveCatchData(StudentData)
+//    }
     
     func GetAddress(xmlString:String) -> String{
-        var nserr : NSError?
+        
         let xml: AEXMLDocument?
         do {
             xml = try AEXMLDocument(xmlData: xmlString.dataValue)
@@ -169,12 +165,12 @@ class StudentInfoViewCtrl: UIViewController,UITableViewDelegate,UITableViewDataS
         }
     }
     
-    func LockBtnEnableCheck(){
-        if Global.Students.contains(StudentData){
-            AddBtn.enabled = false
-        }
-        else{
-            AddBtn.enabled = true
-        }
-    }
+//    func LockBtnEnableCheck(){
+//        if Global.Students.contains(StudentData){
+//            AddBtn.enabled = false
+//        }
+//        else{
+//            AddBtn.enabled = true
+//        }
+//    }
 }

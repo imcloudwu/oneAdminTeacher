@@ -15,6 +15,8 @@ class ClassViewCtrl: ToggleView,UITableViewDelegate,UITableViewDataSource{
     @IBOutlet weak var progress: UIProgressView!
     @IBOutlet weak var noDataLabel: UILabel!
     
+    @IBOutlet weak var addClassBtn: UIButton!
+    
     //var progressTimer : ProgressTimer!
     var refreshControl : UIRefreshControl!
     
@@ -25,8 +27,18 @@ class ClassViewCtrl: ToggleView,UITableViewDelegate,UITableViewDataSource{
     let redColor = UIColor(red: 244 / 255, green: 67 / 255, blue: 54 / 255, alpha: 1)
     let blueColor = UIColor(red: 33 / 255, green: 150 / 255, blue: 243 / 255, alpha: 1)
     
+    @IBAction func addClassBtnClick(sender: AnyObject) {
+        
+        let nextView = self.storyboard?.instantiateViewControllerWithIdentifier("AsTeacherViewCtrl") as! AsTeacherViewCtrl
+        
+        self.navigationController?.pushViewController(nextView, animated: true)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        addClassBtn.layer.masksToBounds = true
+        addClassBtn.layer.cornerRadius = addClassBtn.frame.width / 2
         
         self.refreshControl = UIRefreshControl()
         self.refreshControl.attributedTitle = NSAttributedString(string: "")
