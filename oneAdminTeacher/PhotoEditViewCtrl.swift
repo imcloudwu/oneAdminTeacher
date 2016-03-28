@@ -399,7 +399,7 @@ class PhotoEditViewCtrl: UIViewController,UIImagePickerControllerDelegate,ELCIma
         let dsns = Base == nil ? AlbumData.School : Base.Dsns
         let groupId = Base == nil ? AlbumData.RefGroupId : Base.RefGroupId
         
-        let rsp = try? HttpClient.Get("https://dsns.1campus.net/\(dsns)/sakura/GetGroupMember?stt=PassportAccessToken&AccessToken=\(Global.AccessToken)&parser=spliter&content=GroupId:\(groupId)")
+        let rsp = try? HttpClient.Get("http://dsns.1campus.net/\(dsns)/sakura/GetGroupMember?stt=PassportAccessToken&AccessToken=\(Global.AccessToken)&parser=spliter&content=GroupId:\(groupId)")
         
         if rsp == nil{
             return retVal
@@ -428,9 +428,9 @@ class PhotoEditViewCtrl: UIViewController,UIImagePickerControllerDelegate,ELCIma
             }
         }
         
-        retVal.sortInPlace({ $0.SeatNo < $1.SeatNo})
+        //retVal.sortInPlace({ $0.SeatNo < $1.SeatNo})
         
-        return retVal
+        return retVal.sort({ $0.SeatNo < $1.SeatNo})
     }
 
     func GetDataTags() -> [TagStudent]{

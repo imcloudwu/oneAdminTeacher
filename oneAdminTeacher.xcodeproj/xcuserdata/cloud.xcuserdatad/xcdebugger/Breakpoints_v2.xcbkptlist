@@ -593,6 +593,38 @@
             endingLineNumber = "433"
             landmarkName = "GetGroupMembers()"
             landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "oneAdminTeacher.PhotoEditViewCtrl.GetGroupMembers (oneAdminTeacher.PhotoEditViewCtrl)() -&gt; Swift.Array&lt;oneAdminTeacher.TagStudent&gt;"
+                  moduleName = "oneAdminTeacher"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/cloud/Desktop/oneAdminTeacher/oneAdminTeacher/PhotoEditViewCtrl.swift"
+                  timestampString = "478691504.031734"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "433"
+                  endingLineNumber = "433"
+                  offsetFromSymbolStart = "3672">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "oneAdminTeacher.PhotoEditViewCtrl.(GetGroupMembers (oneAdminTeacher.PhotoEditViewCtrl) -&gt; () -&gt; Swift.Array&lt;oneAdminTeacher.TagStudent&gt;).(closure #1)"
+                  moduleName = "oneAdminTeacher"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/cloud/Desktop/oneAdminTeacher/oneAdminTeacher/PhotoEditViewCtrl.swift"
+                  timestampString = "478691504.032137"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "433"
+                  endingLineNumber = "433"
+                  offsetFromSymbolStart = "124">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1008,6 +1040,54 @@
             startingLineNumber = "95"
             endingLineNumber = "95"
             landmarkName = "GetMyClassList()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "oneAdminTeacher/PhotoEditViewCtrl.swift"
+            timestampString = "478688912.840855"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "318"
+            endingLineNumber = "318"
+            landmarkName = "SavePhoto()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "oneAdminTeacher/PhotoEditViewCtrl.swift"
+            timestampString = "478688914.495404"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "322"
+            endingLineNumber = "322"
+            landmarkName = "SavePhoto()"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "oneAdminTeacher/PhotoEditViewCtrl.swift"
+            timestampString = "478688931.895639"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "355"
+            endingLineNumber = "355"
+            landmarkName = "InsertPhoto(_:)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
